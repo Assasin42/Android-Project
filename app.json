@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "week1",
-    "slug": "week1",
+    "name": "navigation-and-bottom-tabs",
+    "slug": "navigation-and-bottom-tabs",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -24,6 +24,9 @@
     },
     "web": {
       "favicon": "./assets/favicon.png"
-    }
+    },
+    "plugins": [
+      "expo-secure-store"
+    ]
   }
 }
