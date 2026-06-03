@@ -1,22 +1,28 @@
-
-
+import { useState } from "react";
+import { useDispatch } from "react-redux";          // ✅ ekle
+import { logout } from "../redux/authSlice";         // ✅ ekle
+import { signOut } from "firebase/auth";
+import { auth } from "../firebase/firebase";
+import { useSelector } from "react-redux";
 import {
   Text,
   View,
   StyleSheet,
   ImageBackground,
   ScrollView,
+  TouchableOpacity,                                  // ✅ ekle
 } from "react-native";
 import ModalSelect from "../components/modalS";
 import Button from "../components/button";
 import { LinearGradient } from "expo-linear-gradient";
 import { BlurView } from "expo-blur";
 import BusTime from "../components/busTime";
-import { useState } from "react";
 import { useRoute } from "@react-navigation/native";
 export default function HomeScreen() {
   const [selectedValue, setSelectedValue] = useState(null);
   const [showBus, setShowBus] = useState(false);
+  const dispatch = useDispatch();
+
   const secButton = () => {
     if (selectedValue == null) alert("Lütfen bir durak seçiniz.");
     else {
@@ -25,8 +31,9 @@ export default function HomeScreen() {
       setSelectedValue(null);
     }
   };
-  const route = useRoute();
-  const { name } = route.params || {};
+  
+  // EKLE
+const user = useSelector((state) => state.auth.user);
   const options = [
     { label: "Sema Doğan", value: "Sema Doğan" },
     { label: "Hastane", value: "Hastane" },
@@ -48,7 +55,7 @@ export default function HomeScreen() {
       />
 
       <BlurView intensity={10} borderRadius={30} style={styles.header}>
-        <Text style={styles.headerText}>Hoşgeldiniz {name} </Text>
+        <Text style={styles.headerText}>Hoşgeldiniz {user?.displayName || "Yolcu"}</Text>
       </BlurView>
 
       <View style={styles.content}>
@@ -58,6 +65,7 @@ export default function HomeScreen() {
             value={selectedValue}
             onSelect={(value) => setSelectedValue(value)}
           />
+
         </View>
 
         <View style={styles.buttonviewContainer}>

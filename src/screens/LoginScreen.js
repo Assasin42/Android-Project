@@ -1,172 +1,146 @@
 import React, { useState } from "react";
+import { signInWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase/firebase";
+import { useDispatch } from "react-redux";
+import { loginSuccess } from "../redux/authSlice";
 
-import { getUsers } from "../api/users_api.js";
+
 import {
   View,
   Text,
   TextInput,
   StyleSheet,
   TouchableOpacity,
-  ImageBackground,
   KeyboardAvoidingView,
   Image,
+  ActivityIndicator,
 } from "react-native";
 
-export default function LoginScreen({ setUserData, setIsRegistering }) {
+export default function LoginScreen({ setIsRegistering }) {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  
+  const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
-
- const handleLogin = async () => {
-  try {
-    const response = await getUsers();
-
-    const users = response.data; 
-
-    if (!Array.isArray(users)) {
-      console.error("Hata: Gelen veri bir liste (array) değil!", users);
-      alert("Sunucu verisi hatalı formatta.");
+  const handleLogin = async () => {
+    if (!email || !password) {
+      alert("Email ve şifre zorunlu");
       return;
     }
 
-    const foundUser = users.find(
-      (user) => 
-        user.email.trim().toLowerCase() === email.trim().toLowerCase() && 
-        String(user.password) === String(password)
-    );
+    try {
+      setLoading(true);
+      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const user = userCredential.user;
 
-    if (foundUser) {
-      setUserData(foundUser); 
-    } else {
+      // Redux'a kullanıcı bilgisini kaydet (persist ile saklanacak)
+      dispatch(loginSuccess({
+        uid: user.uid,
+        email: user.email,
+        displayName: user.displayName,
+      }));
+
+    } catch (error) {
+      console.log(error);
       alert("Email veya şifre yanlış");
+    } finally {
+      setLoading(false);
     }
-  } catch (error) {
-    console.log("Hata:", error);
-    alert("Bağlantı hatası.");
-  }
-};
+  };
 
   return (
-   <KeyboardAvoidingView style={styles.innerContainer} behavior="height">
+    <KeyboardAvoidingView style={styles.container} behavior="padding">
+      <Image
+        source={require("../../assets/belediye_logo2.png")}
+        style={styles.logo}
+        resizeMode="contain"
+      />
 
-    
-    <Image
-      source={require("../../assets/belediye_logo2.png")}
-      style={styles.topImage}
-      resizeMode="contain"
-    />
+      <Text style={styles.title}>GÜMÜŞHANE</Text>
+      <Text style={styles.subtitle}>AKILLI ULAŞIM SİSTEMİ</Text>
 
-      <View style={styles.overlay}>
-        <View style={styles.container}>
-            <Text style={styles.title1}>GÜMÜŞHANE</Text>
-          <Text style={styles.title}>AKILLI ULAŞIM SİSTEMİ</Text>
+      <TextInput
+        placeholder="Email"
+        placeholderTextColor="#999"
+        keyboardType="email-address"
+        style={styles.input}
+        value={email}
+        onChangeText={setEmail}
+        autoCapitalize="none"
+      />
 
-          <TextInput
-            placeholder="Email"
-            placeholderTextColor="#ccc"
-            keyboardType="email-address"
-            style={styles.input}
-            value={email}
-            onChangeText={setEmail}
-          />
+      <TextInput
+        placeholder="Şifre"
+        placeholderTextColor="#999"
+        secureTextEntry
+        style={styles.input}
+        value={password}
+        onChangeText={setPassword}
+      />
 
-          <TextInput
-            placeholder="Şifre"
-            placeholderTextColor="#ccc"
-            secureTextEntry
-            style={styles.input}
-            value={password}
-            onChangeText={setPassword}
-          />
+      <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
+        {loading ? (
+          <ActivityIndicator color="white" />
+        ) : (
+          <Text style={styles.buttonText}>Giriş Yap</Text>
+        )}
+      </TouchableOpacity>
 
-          <TouchableOpacity style={styles.button} onPress={handleLogin}>
-            <Text style={styles.buttonText}>Giriş Yap</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity onPress={() => setIsRegistering(true)}>
-            <Text style={styles.link}>Hesabın yok mu? Üye Ol</Text>
-          </TouchableOpacity>
-
-        </View>
-      </View>
+      <TouchableOpacity onPress={() => setIsRegistering(true)}>
+        <Text style={styles.link}>Hesabın yok mu? Üye Ol</Text>
+      </TouchableOpacity>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
- background: {
-  flex: 1,
-},
-  overlay: {
+  container: {
     flex: 1,
-    backgroundColor: "rgba(255, 255, 255, 0.7)", // biraz daha premium karanlık
-    justifyContent: "center",
+    backgroundColor: "#fff",
     paddingHorizontal: 25,
+    justifyContent: "center",
   },
-
- container: {
-  flex: 1,
-  backgroundColor: "#FFFFFF", 
-},
-innerContainer: {
-  flex: 1,
-
-},
-topImage: {
-  width: 350,      
-  height: 250,
-  alignSelf: "center",
-  marginBottom: 50,
-  marginTop: 90,
-},
-
- title: {
-  fontSize: 16,
-  fontWeight: "bold",
-  textAlign: "center",
-  marginBottom: 15,
-  color: "#504e4e",
-},
-title1: {
-  fontSize: 16,
-  fontWeight: "bold",
-  textAlign: "center",
-  marginBottom: 0,
-  color: "#504e4e",
-},
+  logo: {
+    width: 250,
+    height: 150,
+    alignSelf: "center",
+    marginBottom: 20,
+  },
+  title: {
+    fontSize: 18,
+    fontWeight: "bold",
+    textAlign: "center",
+    color: "#35393d",
+  },
+  subtitle: {
+    fontSize: 14,
+    textAlign: "center",
+    color: "#504e4e",
+    marginBottom: 30,
+  },
   input: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#fff",
     paddingHorizontal: 15,
-    paddingVertical: 15,
+    paddingVertical: 12,
     borderRadius: 12,
-    marginBottom: 15,
+    marginBottom: 12,
     borderWidth: 1,
     borderColor: "#EAEAEA",
     fontSize: 16,
   },
-
   button: {
     backgroundColor: "#35393d",
     padding: 15,
     borderRadius: 10,
     alignItems: "center",
     marginTop: 10,
-
-    // gölge (çok fark yaratır)
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 5,
     elevation: 5,
   },
-
   buttonText: {
-    color: "#FFFFFF",
-    fontSize: 15,
+    color: "white",
     fontWeight: "bold",
+    fontSize: 15,
   },
-
   link: {
     color: "#524a4a",
     marginTop: 20,

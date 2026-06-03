@@ -1,10 +1,18 @@
-import { registerRootComponent } from 'expo';
+import { registerRootComponent } from "expo";
+import App from "./App";
 
-import App from './App';
-import HomeScreen from './src/screens/HomeScreen';
-import LinesScreen from './src/screens/LinesScreen';
+import { Provider } from "react-redux";
+import { store, persistor } from "./src/redux/store";
+import { PersistGate } from "redux-persist/integration/react";
 
-// registerRootComponent calls AppRegistry.registerComponent('main', () => App);
-// It also ensures that whether you load the app in Expo Go or in a native build,
-// the environment is set up appropriately
-registerRootComponent(App);
+function Root() {
+  return (
+    <Provider store={store}>
+      <PersistGate loading={null} persistor={persistor}>
+        <App />
+      </PersistGate>
+    </Provider>
+  );
+}
+
+registerRootComponent(Root);

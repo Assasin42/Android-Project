@@ -1,15 +1,18 @@
 import React, { useState } from "react";
-import { registerUser } from "../api/users_api.js";
-import { useNavigation } from "@react-navigation/native";
+import { createUserWithEmailAndPassword } from "firebase/auth";
+import { auth } from "../firebase/firebase";
+import { useDispatch } from "react-redux";
+import { loginSuccess } from "../redux/authSlice";
+import { updateProfile } from "firebase/auth";  // updateProfile ekle
 import {
   View,
   Text,
   TextInput,
-  StyleSheet,
   TouchableOpacity,
   KeyboardAvoidingView,
-  Image,
   ScrollView,
+  Image,
+  StyleSheet,
   ActivityIndicator,
 } from "react-native";
 
@@ -19,128 +22,116 @@ export default function RegisterScreen({ setIsRegistering }) {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
+  const dispatch = useDispatch();
 
   const handleRegister = async () => {
-    if (!name || !email || !password) {
-      alert("Lütfen zorunlu alanları doldurun.");
-      return;
-    }
+  if (!email || !password) {
+    alert("Email ve şifre zorunlu");
+    return;
+  }
 
+  try {
     setLoading(true);
-    try {
-      const newUser = {
-        name,
-        surname,
-        phone,
-        email,
-        password,
-        createdAt: new Date().toISOString(),
-        role: "user",
-      };
+    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+    const user = userCredential.user;
 
-      await registerUser(newUser);
+    await updateProfile(user, {
+      displayName: name,
+    });
 
-      
-      alert("Kayıt başarılı");
-      setIsRegistering(false); 
-      
-    } catch (error) {
-      console.log(error);
-      alert("Hata oluştu");
-    } finally {
-      setLoading(false);
-    }
-  };
+    // ✅ Login ekranına at, otomatik giriş yapma
+    setIsRegistering(false);
+
+  } catch (error) {
+    console.log(error);
+    alert("Kayıt başarısız: " + error.message);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
-    <KeyboardAvoidingView style={styles.innerContainer} behavior="padding">
-      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
+    <KeyboardAvoidingView style={styles.container} behavior="padding">
+      <ScrollView
+        showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
+      >
         <Image
           source={require("../../assets/belediye_logo2.png")}
-          style={styles.topImage}
+          style={styles.logo}
           resizeMode="contain"
         />
 
-        <View style={styles.overlay}>
-          <View style={styles.container}>
-            <Text style={styles.title}>Üye Ol</Text>
+        <Text style={styles.title}>Üye Ol</Text>
 
-            <TextInput
-              placeholder="Ad"
-              placeholderTextColor="#ccc"
-              style={styles.input}
-              value={name}
-              onChangeText={setName}
-            />
+        <TextInput
+          placeholder="Ad"
+          placeholderTextColor="#999"
+          style={styles.input}
+          value={name}
+          onChangeText={setName}
+        />
+        <TextInput
+          placeholder="Soyad"
+          placeholderTextColor="#999"
+          style={styles.input}
+          value={surname}
+          onChangeText={setSurname}
+        />
+        <TextInput
+          placeholder="Telefon"
+          placeholderTextColor="#999"
+          style={styles.input}
+          keyboardType="phone-pad"
+          value={phone}
+          onChangeText={setPhone}
+        />
+        <TextInput
+          placeholder="Email"
+          placeholderTextColor="#999"
+          style={styles.input}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          value={email}
+          onChangeText={setEmail}
+        />
+        <TextInput
+          placeholder="Şifre"
+          placeholderTextColor="#999"
+          secureTextEntry
+          style={styles.input}
+          value={password}
+          onChangeText={setPassword}
+        />
 
-            <TextInput
-              placeholder="Soyad"
-              placeholderTextColor="#ccc"
-              style={styles.input}
-              value={surname}
-              onChangeText={setSurname}
-            />
+        <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={loading}>
+          {loading ? (
+            <ActivityIndicator color="white" />
+          ) : (
+            <Text style={styles.buttonText}>Kayıt Ol</Text>
+          )}
+        </TouchableOpacity>
 
-            <TextInput
-              placeholder="Telefon"
-              placeholderTextColor="#ccc"
-              style={styles.input}
-              keyboardType="phone-pad"
-              value={phone}
-              onChangeText={setPhone}
-            />
-
-            <TextInput
-              placeholder="Email"
-              placeholderTextColor="#ccc"
-              style={styles.input}
-              keyboardType="email-address"
-              value={email}
-              onChangeText={setEmail}
-            />
-
-            <TextInput
-              placeholder="Şifre"
-              placeholderTextColor="#ccc"
-              secureTextEntry
-              style={styles.input}
-              value={password}
-              onChangeText={setPassword}
-            />
-
-            <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={loading}>
-              {loading ? (
-                <ActivityIndicator color="white" />
-              ) : (
-                <Text style={styles.buttonText}>Kayıt Ol</Text>
-              )}
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => setIsRegistering(false)}>
-              <Text style={styles.link}>Zaten hesabın var mı? Giriş Yap</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
+        <TouchableOpacity onPress={() => setIsRegistering(false)}>
+          <Text style={styles.link}>Zaten hesabın var mı? Giriş Yap</Text>
+        </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  innerContainer: {
+  container: {
     flex: 1,
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#fff",
   },
-  overlay: {
+  scrollContent: {
+    flexGrow: 1,
     paddingHorizontal: 25,
     paddingBottom: 40,
   },
-  container: {
-    flex: 1,
-  },
-  topImage: {
+  logo: {
     width: 250,
     height: 150,
     alignSelf: "center",
@@ -155,7 +146,7 @@ const styles = StyleSheet.create({
     color: "#504e4e",
   },
   input: {
-    backgroundColor: "#FFFFFF",
+    backgroundColor: "#fff",
     paddingHorizontal: 15,
     paddingVertical: 12,
     borderRadius: 12,

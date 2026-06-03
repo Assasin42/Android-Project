@@ -1,38 +1,49 @@
 import { StatusBar } from 'expo-status-bar';
-import * as SecureStore from 'expo-secure-store';
 import { StyleSheet, Text, View, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
 import React from 'react';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
-import { deleteUser } from '../api/users_api.js';
+import { useDispatch, useSelector } from 'react-redux';  // ✅
+import { logout } from '../redux/authSlice';              // ✅
+import { signOut, deleteUser } from 'firebase/auth';      // ✅
+import { auth } from '../firebase/firebase';              // ✅
 
 export default function ProfileScreen() {
   const navigation = useNavigation();
-  const route = useRoute();
-  const { user: routeUser, setUserData } = route.params || {};
+  const dispatch = useDispatch();
+  const user = useSelector((state) => state.auth.user);  // Redux'tan kullanıcı
 
-  const logout = async () => {
-    await SecureStore.deleteItemAsync("user");
-    setUserData(null);
-  };
-
+const handleLogout = async () => {
+  try {
+    await signOut(auth);          // Firebase oturumu kapat
+    dispatch(logout());            // Redux state temizle (persist de silinir)
+  } catch (error) {
+    console.log(error);
+    alert("Çıkış yapılamadı");
+  }
+};
   const handleDeleteAccount = async () => {
     try {
-      await deleteUser(routeUser.id);
-      await SecureStore.deleteItemAsync("user");
-      setUserData(null);
+      const currentUser = auth.currentUser;
+      if (currentUser) {
+        await deleteUser(currentUser);  // Firebase'den sil
+      }
+      dispatch(logout());               // Redux temizle
       alert('Hesabınız başarıyla silindi.');
     } catch (error) {
       console.log(error);
-      alert('Hesap silinirken hata oluştu.');
+      // Firebase bazen yeniden giriş ister
+      if (error.code === 'auth/requires-recent-login') {
+        alert('Hesabı silmek için tekrar giriş yapmanız gerekiyor.');
+      } else {
+        alert('Hesap silinirken hata oluştu.');
+      }
     }
   };
 
   const displayData = {
-    fullName: routeUser?.name ? `${routeUser.name} ${routeUser?.surname || ''}` : "Misafir Kullanıcı",
-    phone: routeUser?.phone || "Telefon numarası eklenmemiş",
-    email: routeUser?.email || "",
-    memberSince: routeUser?.createdAt ? new Date(routeUser.createdAt).toLocaleDateString('tr-TR') : "Bilinmiyor"
+    fullName: user?.email || "Kullanıcı",
+    email: user?.email || "",
   };
 
   return (
@@ -48,9 +59,7 @@ export default function ProfileScreen() {
       <ScrollView showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
           <Text style={styles.userName}>{displayData.fullName}</Text>
-          <Text style={styles.userPhone}>{displayData.phone}</Text>
           <Text style={styles.userPhone}>{displayData.email}</Text>
-          <Text style={styles.memberDate}>Üyelik: {displayData.memberSince}</Text>
         </View>
 
         <View style={styles.menuSection}>
@@ -58,12 +67,10 @@ export default function ProfileScreen() {
             <Text style={styles.menuText}>Hat Bildirim Ayarları</Text>
             <Text style={styles.arrow}>›</Text>
           </TouchableOpacity>
-
           <TouchableOpacity style={styles.menuItem}>
             <Text style={styles.menuText}>Uygulama Hakkında</Text>
             <Text style={styles.arrow}>›</Text>
           </TouchableOpacity>
-
           <TouchableOpacity style={styles.menuItem}>
             <Text style={styles.menuText}>Bize Ulaşın / Geri Bildirim</Text>
             <Text style={styles.arrow}>›</Text>
@@ -71,7 +78,7 @@ export default function ProfileScreen() {
         </View>
 
         <View style={styles.footer}>
-          <TouchableOpacity style={styles.logoutButton} onPress={logout}>
+          <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
             <Text style={styles.logoutText}>Oturumu Kapat</Text>
           </TouchableOpacity>
         </View>
@@ -95,9 +102,8 @@ const styles = StyleSheet.create({
     shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2,
   },
   header: { paddingHorizontal: 25, paddingTop: 15, paddingBottom: 30, borderBottomWidth: 1, borderBottomColor: '#f0f0f0' },
-  userName: { fontSize: 26, fontWeight: 'bold', color: '#1a1a1a', textTransform: 'capitalize' },
+  userName: { fontSize: 26, fontWeight: 'bold', color: '#1a1a1a' },
   userPhone: { fontSize: 15, color: '#666', marginTop: 4 },
-  memberDate: { fontSize: 13, color: '#999', marginTop: 8 },
   menuSection: { paddingVertical: 10 },
   menuItem: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
