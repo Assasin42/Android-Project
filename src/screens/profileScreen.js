@@ -1,5 +1,5 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View, TouchableOpacity, ScrollView, SafeAreaView } from 'react-native';
+import { StyleSheet, Text, View, TouchableOpacity, ScrollView } from 'react-native';
 import React from 'react';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { Ionicons } from '@expo/vector-icons';
@@ -7,7 +7,9 @@ import { useDispatch, useSelector } from 'react-redux';  // ✅
 import { logout } from '../redux/authSlice';              // ✅
 import { signOut, deleteUser } from 'firebase/auth';      // ✅
 import { auth } from '../firebase/firebase';              // ✅
-
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { db } from "../firebase/firebase";
+import { doc, deleteDoc } from "firebase/firestore";  // ✅
 export default function ProfileScreen() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
@@ -23,23 +25,26 @@ const handleLogout = async () => {
   }
 };
   const handleDeleteAccount = async () => {
-    try {
-      const currentUser = auth.currentUser;
-      if (currentUser) {
-        await deleteUser(currentUser);  // Firebase'den sil
-      }
-      dispatch(logout());               // Redux temizle
-      alert('Hesabınız başarıyla silindi.');
-    } catch (error) {
-      console.log(error);
-      // Firebase bazen yeniden giriş ister
-      if (error.code === 'auth/requires-recent-login') {
-        alert('Hesabı silmek için tekrar giriş yapmanız gerekiyor.');
-      } else {
-        alert('Hesap silinirken hata oluştu.');
-      }
+  try {
+    const currentUser = auth.currentUser;
+    if (currentUser) {
+      // ✅ Önce Firestore'daki veriyi sil
+      await deleteDoc(doc(db, "users", currentUser.uid));
+      
+      // ✅ Sonra Firebase Auth'dan sil
+      await deleteUser(currentUser);
     }
-  };
+    dispatch(logout());
+    alert('Hesabınız başarıyla silindi.');
+  } catch (error) {
+    console.log(error);
+    if (error.code === 'auth/requires-recent-login') {
+      alert('Hesabı silmek için tekrar giriş yapmanız gerekiyor.');
+    } else {
+      alert('Hesap silinirken hata oluştu.');
+    }
+  }
+};
 
   const displayData = {
     fullName: user?.email || "Kullanıcı",

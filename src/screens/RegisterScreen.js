@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase/firebase";
 import { useDispatch } from "react-redux";
+import { doc, setDoc } from "firebase/firestore"; // Firestore işlemleri için ekledik
+import { db } from "../firebase/firebase"; // Firestore referansı
 import { loginSuccess } from "../redux/authSlice";
 import { updateProfile } from "firebase/auth";  // updateProfile ekle
 import {
@@ -39,14 +41,22 @@ export default function RegisterScreen({ setIsRegistering }) {
     await updateProfile(user, {
       displayName: name,
     });
-
+  await setDoc(doc(db, "users", user.uid), {
+  uid: user.uid,
+  name: name,
+  surname: surname,
+  phone: phone,
+  email: email,
+  createdAt: new Date().toISOString(),
+});
     // ✅ Login ekranına at, otomatik giriş yapma
     setIsRegistering(false);
 
   } catch (error) {
-    console.log(error);
-    alert("Kayıt başarısız: " + error.message);
-  } finally {
+  console.log("HATA KODU:", error.code);
+  console.log("HATA MESAJI:", error.message);
+  alert("Kayıt başarısız: " + error.message);
+}finally {
     setLoading(false);
   }
 };
