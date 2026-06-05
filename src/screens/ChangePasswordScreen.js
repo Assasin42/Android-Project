@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, ActivityIndicator } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { useNavigation, useRoute } from '@react-navigation/native';
-import { updateUser } from '../api/users_api.js';
+import { useNavigation } from '@react-navigation/native';
+import { auth } from '../firebase/firebase';
+import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 'firebase/auth';
+import { signOut } from 'firebase/auth';
+import { useDispatch } from 'react-redux';
+import { logout } from '../redux/authSlice';
+
 export default function ChangePasswordScreen() {
   const navigation = useNavigation();
-  const route = useRoute();
-  const { user } = route.params || {};
   const [loading, setLoading] = useState(false);
   const [current, setCurrent] = useState('');
   const [newPass, setNewPass] = useState('');
   const [confirm, setConfirm] = useState('');
-
+  const dispatch = useDispatch();
   const handleChangePassword = async () => {
-
     if (!current || !newPass || !confirm) {
       alert('Lütfen tüm alanları doldurun.');
       return;
@@ -22,26 +24,42 @@ export default function ChangePasswordScreen() {
       alert('Yeni şifreler eşleşmiyor.');
       return;
     }
-    if (String(current) !== String(user?.password)) {
-      alert('Mevcut şifre yanlış.');
+    if (newPass.length < 6) {
+      alert('Yeni şifre en az 6 karakter olmalı.');
       return;
     }
+
     setLoading(true);
     try {
-      await updateUser(user.id, { password: newPass });
+      const user = auth.currentUser;
+
+      // Önce mevcut şifreyle kimlik doğrula
+      const credential = EmailAuthProvider.credential(user.email, current);
+      await reauthenticateWithCredential(user, credential);
+
+      // Sonra şifreyi güncelle
+      await updatePassword(user, newPass);
+
       alert('Şifre başarıyla güncellendi!');
+      
+      await signOut(auth);        // ✅ Firebase oturumu kapat
+      dispatch(logout());          // ✅ Redux temizle, login ekranına döner
       navigation.goBack();
     } catch (error) {
       console.log(error);
-      alert('Şifre güncellenirken hata oluştu.');
+      if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
+        alert('Mevcut şifre yanlış.');
+      } else {
+        alert('Şifre güncellenirken hata oluştu: ' + error.message);
+      }
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <KeyboardAvoidingView 
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'} 
+    <KeyboardAvoidingView
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.container}
     >
       <View style={styles.header}>
@@ -54,33 +72,33 @@ export default function ChangePasswordScreen() {
 
       <View style={styles.form}>
         <Text style={styles.label}>Mevcut Şifre</Text>
-        <TextInput 
-          style={styles.input} 
-          secureTextEntry 
+        <TextInput
+          style={styles.input}
+          secureTextEntry
           placeholder="••••••••"
           placeholderTextColor="#999"
           onChangeText={setCurrent}
         />
 
         <Text style={styles.label}>Yeni Şifre</Text>
-        <TextInput 
-          style={styles.input} 
-          secureTextEntry 
+        <TextInput
+          style={styles.input}
+          secureTextEntry
           placeholder="••••••••"
           placeholderTextColor="#999"
           onChangeText={setNewPass}
         />
 
         <Text style={styles.label}>Yeni Şifre (Tekrar)</Text>
-        <TextInput 
-          style={styles.input} 
-          secureTextEntry 
+        <TextInput
+          style={styles.input}
+          secureTextEntry
           placeholder="••••••••"
           placeholderTextColor="#999"
           onChangeText={setConfirm}
         />
 
-        <TouchableOpacity 
+        <TouchableOpacity
           style={styles.saveButton}
           onPress={handleChangePassword}
           disabled={loading}
@@ -98,24 +116,24 @@ export default function ChangePasswordScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F9F9FB' },
-  header: { 
-    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', 
-    paddingTop: 60, paddingHorizontal: 20 
+  header: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    paddingTop: 60, paddingHorizontal: 20
   },
   headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#000' },
-  backButton: { 
-    width: 40, height: 40, backgroundColor: '#fff', borderRadius: 20, 
+  backButton: {
+    width: 40, height: 40, backgroundColor: '#fff', borderRadius: 20,
     justifyContent: 'center', alignItems: 'center', elevation: 2,
     shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2
   },
   form: { padding: 25, marginTop: 20 },
   label: { fontSize: 14, fontWeight: '600', color: '#666', marginBottom: 8 },
-  input: { 
-    backgroundColor: '#fff', borderRadius: 12, padding: 15, marginBottom: 20, 
+  input: {
+    backgroundColor: '#fff', borderRadius: 12, padding: 15, marginBottom: 20,
     borderWidth: 1, borderColor: '#EFEFEF', color: '#000'
   },
-  saveButton: { 
-    backgroundColor: '#34C759', padding: 16, borderRadius: 15, alignItems: 'center', marginTop: 10 
+  saveButton: {
+    backgroundColor: '#34C759', padding: 16, borderRadius: 15, alignItems: 'center', marginTop: 10
   },
   saveButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 }
 });

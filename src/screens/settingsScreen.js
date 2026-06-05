@@ -39,7 +39,7 @@ export default function SettingsScreen() {
                 activeOpacity={0.7} 
                 onPress={() => {
                   if (item.name === 'Şifre Değiştir') {
-                    navigation.navigate('ChangePassword', { user });
+                    navigation.navigate('ChangePassword');
                   } else {
                     console.log(`${item.name} tıklandı`);
                   }

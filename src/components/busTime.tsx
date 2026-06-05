@@ -1,39 +1,61 @@
-import { StyleSheet, View, Text, Pressable, ScrollView } from "react-native";
+import { StyleSheet, View, Text, Pressable, ScrollView, ActivityIndicator } from "react-native";
 import Feather from "@expo/vector-icons/Feather";
+import { useEffect, useState } from "react";
+import { getBusLines } from "../api/firestore_api";
 
-const busList = [
-  { name: "A1", time: "5 dk" },
-  { name: "A2", time: "7 dk" },
-  { name: "A3", time: "31 dk" },
-  { name: "A10", time: "1 dk" },
-  { name: "LM10", time: "10 dk" },
-  { name: "Q7", time: "3 dk" },
-]
+
+type BusLine = {
+  id: string;
+  name: string;
+  time?: string;
+  stops?: string[];
+};
+
+// useState'i şöyle güncelle:
 
 export default function BusTime() {
+  const [busList, setBusList] = useState<BusLine[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchBusLines = async () => {
+      try {
+        const data = await getBusLines();
+        setBusList(data);
+      } catch (error) {
+        console.log(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchBusLines();
+  }, []);
+
+  if (loading) {
+    return <ActivityIndicator size="large" color="#1A3263" />;
+  }
+
   return (
-    
     <View style={styles.container}>
       <ScrollView
-      style={styles.scroll}
-      contentContainerStyle={styles.scrollContent}
-      showsVerticalScrollIndicator={true}>
-      {busList.map((bus,index) => (
-        <View key={index} style={styles.Abuttons}>
-          <Pressable style={styles.busTimeButton}>
-            <Text style={styles.buttonText}>{bus.name}</Text> 
-            <View style={styles.timeContainer}>
-              <Feather name="clock" size={18} color={"#1A3263"}/>
-              <Text style={styles.buttonText}>{bus.time}</Text>
-            </View>
-          </Pressable>
-        </View>
-      ))}    
+        style={styles.scroll}
+        contentContainerStyle={styles.scrollContent}
+        showsVerticalScrollIndicator={true}
+      >
+        {busList.map((bus, index) => (
+          <View key={index} style={styles.Abuttons}>
+            <Pressable style={styles.busTimeButton}>
+              <Text style={styles.buttonText}>{bus.name}</Text>
+              <View style={styles.timeContainer}>
+                <Feather name="clock" size={18} color={"#1A3263"} />
+                <Text style={styles.buttonText}>{bus.time ?? "-"}</Text>
+              </View>
+            </Pressable>
+          </View>
+        ))}
       </ScrollView>
-
-      
-      
-    </View> 
+    </View>
   );
 }
 

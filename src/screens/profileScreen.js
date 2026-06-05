@@ -47,7 +47,7 @@ const handleLogout = async () => {
 };
 
   const displayData = {
-    fullName: user?.email || "Kullanıcı",
+    fullName: user?.displayName  || "Kullanıcı",
     email: user?.email || "",
   };
 
