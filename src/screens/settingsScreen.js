@@ -38,13 +38,17 @@ export default function SettingsScreen() {
                 style={styles.listItem} 
                 activeOpacity={0.7} 
                 onPress={() => {
-                  if (item.name === 'Şifre Değiştir') {
+                  // Tıklanan seçeneğe göre doğru ekrana yönlendiriyoruz
+                  if (item.name === 'Bildirim Ayarları') {
+                    navigation.navigate('NotificationSettings');
+                  } else if (item.name === 'Şifre Değiştir') {
                     navigation.navigate('ChangePassword');
                   } else {
                     console.log(`${item.name} tıklandı`);
                   }
                 }}
               >
+              
                 <View style={styles.itemLeft}>
                   <View style={[styles.iconCircle, { backgroundColor: item.bgColor }]}>
                     <Ionicons name={item.icon} size={22} color={item.color} />

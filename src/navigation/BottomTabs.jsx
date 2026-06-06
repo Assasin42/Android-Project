@@ -7,6 +7,7 @@ import HomeScreen from "../screens/HomeScreen.js";
 import ProfileScreen from "../screens/profileScreen.js";
 import SettingsScreen from "../screens/settingsScreen.js";
 import ChangePasswordScreen from "../screens/ChangePasswordScreen.js";
+import NotificationSettingsScreen from '../screens/NotificationSettingsScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -17,6 +18,7 @@ function SettingsStack({ route }) {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="SettingsMain" component={SettingsScreen} initialParams={{ user }} />
       <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
+      <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />
     </Stack.Navigator>
   );
 }
