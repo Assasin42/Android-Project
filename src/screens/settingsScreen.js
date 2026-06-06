@@ -38,11 +38,13 @@ export default function SettingsScreen() {
                 style={styles.listItem} 
                 activeOpacity={0.7} 
                 onPress={() => {
-                  // Tıklanan seçeneğe göre doğru ekrana yönlendiriyoruz
                   if (item.name === 'Bildirim Ayarları') {
                     navigation.navigate('NotificationSettings');
                   } else if (item.name === 'Şifre Değiştir') {
                     navigation.navigate('ChangePassword');
+                  } else if (item.name === 'Yardım ve Destek') {
+                    // Navigasyondaki ismi tetikliyoruz
+                    navigation.navigate('HelpSupport');
                   } else {
                     console.log(`${item.name} tıklandı`);
                   }
