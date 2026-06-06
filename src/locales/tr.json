@@ -1,0 +1,86 @@
+{
+  "common": {
+    "close": "Kapat",
+    "loading": "Yükleniyor..."
+  },
+  "login": {
+    "title": "GÜMÜŞHANE",
+    "subtitle": "AKILLI ULAŞIM SİSTEMİ",
+    "email": "Email",
+    "password": "Şifre",
+    "loginButton": "Giriş Yap",
+    "noAccount": "Hesabın yok mu? Üye Ol",
+    "emailRequired": "Email ve şifre zorunlu",
+    "wrongCredentials": "Email veya şifre yanlış"
+  },
+  "register": {
+    "title": "Üye Ol",
+    "name": "Ad",
+    "surname": "Soyad",
+    "phone": "Telefon",
+    "email": "Email",
+    "password": "Şifre",
+    "registerButton": "Kayıt Ol",
+    "hasAccount": "Zaten hesabın var mı? Giriş Yap",
+    "emailRequired": "Email ve şifre zorunlu",
+    "failed": "Kayıt başarısız"
+  },
+  "home": {
+    "welcome": "Hoşgeldiniz",
+    "passenger": "Yolcu",
+    "selectStop": "Bulunduğunuz Durağı Seçiniz",
+    "selectButton": "Seç",
+    "noStop": "Lütfen bir durak seçiniz.",
+    "stops": {
+      "semaDogan": "Sema Doğan",
+      "hospital": "Hastane",
+      "university": "Üniversite",
+      "market": "Çarşı",
+      "busStation": "Otogar",
+      "zeynepAna": "Zeynep Ana",
+      "tepeYurt": "Tepe Yurt",
+      "teachersHouse": "Öğretmen Evi"
+    }
+  },
+  "profile": {
+    "lineNotifications": "Hat Bildirim Ayarları",
+    "aboutApp": "Uygulama Hakkında",
+    "feedback": "Bize Ulaşın / Geri Bildirim",
+    "logout": "Oturumu Kapat",
+    "deleteAccount": "Hesabı Sil",
+    "deleteSuccess": "Hesabınız başarıyla silindi.",
+    "deleteError": "Hesap silinirken hata oluştu.",
+    "logoutError": "Çıkış yapılamadı",
+    "reauthRequired": "Hesabı silmek için tekrar giriş yapmanız gerekiyor.",
+    "guestUser" : "Misafir Kullanıcı",
+    "phone": "Telefon yok",
+    "unknown": "Bilinmiyor",
+    "memberSince": "Üyelik tarihi"
+  },
+  "settings": {
+    "sectionTitle": "Hesap ve Uygulama",
+    "notifications": "Bildirim Ayarları",
+    "changePassword": "Şifre Değiştir",
+    "language": "Dil Seçenekleri",
+    "darkMode": "Karanlık Mod",
+    "helpSupport": "Yardım ve Destek",
+    "selectLanguage": "Dil Seç",
+    "turkish": "Türkçe",
+    "english": "English"
+  },
+  "changePassword": {
+    "title": "Şifre Değiştir",
+    "current": "Mevcut Şifre",
+    "new": "Yeni Şifre",
+    "confirm": "Yeni Şifre (Tekrar)",
+    "update": "Şifreyi Güncelle",
+    "fillAll": "Lütfen tüm alanları doldurun.",
+    "notMatch": "Yeni şifreler eşleşmiyor.",
+    "wrongCurrent": "Mevcut şifre yanlış.",
+    "success": "Şifre başarıyla güncellendi!",
+    "error": "Şifre güncellenirken hata oluştu."
+  },
+  "lines": {
+    "title": "Hatlar"
+  }
+}

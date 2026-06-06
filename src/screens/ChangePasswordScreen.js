@@ -7,51 +7,41 @@ import { EmailAuthProvider, reauthenticateWithCredential, updatePassword } from 
 import { signOut } from 'firebase/auth';
 import { useDispatch } from 'react-redux';
 import { logout } from '../redux/authSlice';
+import { useTranslation } from 'react-i18next';
 
-export default function ChangePasswordScreen() {
+
+export default function ChangePasswordScreen({ route }) {
   const navigation = useNavigation();
+  const { user } = route.params || {};
+ 
   const [loading, setLoading] = useState(false);
   const [current, setCurrent] = useState('');
   const [newPass, setNewPass] = useState('');
   const [confirm, setConfirm] = useState('');
-  const dispatch = useDispatch();
+  const { t } = useTranslation();
+
   const handleChangePassword = async () => {
     if (!current || !newPass || !confirm) {
-      alert('Lütfen tüm alanları doldurun.');
+      alert(t('changePassword.fillAll'));
       return;
     }
     if (newPass !== confirm) {
-      alert('Yeni şifreler eşleşmiyor.');
+      alert(t('changePassword.notMatch'));
       return;
     }
-    if (newPass.length < 6) {
-      alert('Yeni şifre en az 6 karakter olmalı.');
+    if (String(current) !== String(user?.password)) {
+      alert(t('changePassword.wrongCurrent'));
       return;
     }
 
     setLoading(true);
     try {
-      const user = auth.currentUser;
-
-      // Önce mevcut şifreyle kimlik doğrula
-      const credential = EmailAuthProvider.credential(user.email, current);
-      await reauthenticateWithCredential(user, credential);
-
-      // Sonra şifreyi güncelle
-      await updatePassword(user, newPass);
-
-      alert('Şifre başarıyla güncellendi!');
-      
-      await signOut(auth);        // ✅ Firebase oturumu kapat
-      dispatch(logout());          // ✅ Redux temizle, login ekranına döner
+      await updateUser(user.id, { password: newPass });
+      alert(t('changePassword.updateSuccess'));
       navigation.goBack();
     } catch (error) {
       console.log(error);
-      if (error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential') {
-        alert('Mevcut şifre yanlış.');
-      } else {
-        alert('Şifre güncellenirken hata oluştu: ' + error.message);
-      }
+      alert(t('changePassword.updateError'));
     } finally {
       setLoading(false);
     }
@@ -66,12 +56,12 @@ export default function ChangePasswordScreen() {
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
           <Ionicons name="chevron-back" size={24} color="black" />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Şifre Değiştir</Text>
+        <Text style={styles.headerTitle}>{t('changePassword.title')}</Text>
         <View style={{ width: 40 }} />
       </View>
 
       <View style={styles.form}>
-        <Text style={styles.label}>Mevcut Şifre</Text>
+        <Text style={styles.label}>{t('changePassword.currentPassword')}</Text>
         <TextInput
           style={styles.input}
           secureTextEntry
@@ -80,7 +70,7 @@ export default function ChangePasswordScreen() {
           onChangeText={setCurrent}
         />
 
-        <Text style={styles.label}>Yeni Şifre</Text>
+        <Text style={styles.label}>{t('changePassword.newPassword')}</Text>
         <TextInput
           style={styles.input}
           secureTextEntry
@@ -89,7 +79,7 @@ export default function ChangePasswordScreen() {
           onChangeText={setNewPass}
         />
 
-        <Text style={styles.label}>Yeni Şifre (Tekrar)</Text>
+        <Text style={styles.label}>{t('changePassword.confirmPassword')}</Text>
         <TextInput
           style={styles.input}
           secureTextEntry
@@ -106,7 +96,7 @@ export default function ChangePasswordScreen() {
           {loading ? (
             <ActivityIndicator color="#fff" />
           ) : (
-            <Text style={styles.saveButtonText}>Şifreyi Güncelle</Text>
+            <Text style={styles.saveButtonText}>{t('changePassword.updateButton')}</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -118,22 +108,22 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F9F9FB' },
   header: {
     flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
-    paddingTop: 60, paddingHorizontal: 20
+    paddingTop: 60, paddingHorizontal: 20,
   },
   headerTitle: { fontSize: 18, fontWeight: 'bold', color: '#000' },
   backButton: {
     width: 40, height: 40, backgroundColor: '#fff', borderRadius: 20,
     justifyContent: 'center', alignItems: 'center', elevation: 2,
-    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2
+    shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.1, shadowRadius: 2,
   },
   form: { padding: 25, marginTop: 20 },
   label: { fontSize: 14, fontWeight: '600', color: '#666', marginBottom: 8 },
   input: {
     backgroundColor: '#fff', borderRadius: 12, padding: 15, marginBottom: 20,
-    borderWidth: 1, borderColor: '#EFEFEF', color: '#000'
+    borderWidth: 1, borderColor: '#EFEFEF', color: '#000',
   },
   saveButton: {
-    backgroundColor: '#34C759', padding: 16, borderRadius: 15, alignItems: 'center', marginTop: 10
+    backgroundColor: '#34C759', padding: 16, borderRadius: 15, alignItems: 'center', marginTop: 10,
   },
-  saveButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 }
+  saveButtonText: { color: '#fff', fontWeight: 'bold', fontSize: 16 },
 });

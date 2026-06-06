@@ -1,16 +1,17 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";          // ✅ ekle
-import { logout } from "../redux/authSlice";         // ✅ ekle
+import { useDispatch } from "react-redux";          
+import { logout } from "../redux/authSlice";        
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase/firebase";
 import { useSelector } from "react-redux";
+import { useTranslation } from 'react-i18next';
 import {
   Text,
   View,
   StyleSheet,
   ImageBackground,
   ScrollView,
-  TouchableOpacity,                                  // ✅ ekle
+  TouchableOpacity,                                 
 } from "react-native";
 import ModalSelect from "../components/modalS";
 import Button from "../components/button";
@@ -18,22 +19,22 @@ import { LinearGradient } from "expo-linear-gradient";
 import { BlurView } from "expo-blur";
 import BusTime from "../components/busTime";
 import { useRoute } from "@react-navigation/native";
+
 export default function HomeScreen() {
   const [selectedValue, setSelectedValue] = useState(null);
   const [showBus, setShowBus] = useState(false);
-  const dispatch = useDispatch();
+  const route = useRoute();
+  const { name } = route.params || {};
+  const { t } = useTranslation();
 
   const secButton = () => {
-    if (selectedValue == null) alert("Lütfen bir durak seçiniz.");
+    if (selectedValue == null) alert(t('home.selectStop'));
     else {
       setShowBus(true);
-
       setSelectedValue(null);
     }
   };
-  
-  // EKLE
-const user = useSelector((state) => state.auth.user);
+
   const options = [
     { label: "Sema Doğan", value: "Sema Doğan" },
     { label: "Hastane", value: "Hastane" },
@@ -44,6 +45,7 @@ const user = useSelector((state) => state.auth.user);
     { label: "Tepe Yurt", value: "Tepe Yurt" },
     { label: "Öğretmen Evi", value: "Öğretmen Evi" },
   ];
+
   return (
     <ImageBackground
       source={require("../../assets/guDag.jpeg")}
@@ -53,9 +55,10 @@ const user = useSelector((state) => state.auth.user);
         colors={["rgba(0,0,0,0.6)", "transparent"]}
         style={StyleSheet.absoluteFill}
       />
-
       <BlurView intensity={10} borderRadius={30} style={styles.header}>
-        <Text style={styles.headerText}>Hoşgeldiniz {user?.displayName || "Yolcu"}</Text>
+        <Text style={styles.headerText}>
+          {t('home.welcome')} {name}
+        </Text>
       </BlurView>
 
       <View style={styles.content}>
@@ -65,11 +68,9 @@ const user = useSelector((state) => state.auth.user);
             value={selectedValue}
             onSelect={(value) => setSelectedValue(value)}
           />
-
         </View>
-
         <View style={styles.buttonviewContainer}>
-          <Button label="Seç" theme="primary" onPress={secButton} />
+          <Button label={t('home.select')} theme="primary" onPress={secButton} />
         </View>
         {showBus && <BusTime />}
       </View>
@@ -78,27 +79,9 @@ const user = useSelector((state) => state.auth.user);
 }
 
 const styles = StyleSheet.create({
-  container: {
-    justifyContent: "center",
-    flex: 1,
-    alignItems: "center",
-  },
-  text: {
-    fontSize: 20,
-    color: "#0000",
-    position: "absolute",
-    top: 30,
-    left: 20,
-    fontFamily: "Roboto",
-  },
-  modalContainer: {
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  buttonviewContainer: {
-    alignItems: "center",
-    marginBottom: 20,
-  },
+  container: { justifyContent: "center", flex: 1, alignItems: "center" },
+  modalContainer: { alignItems: "center", marginBottom: 20 },
+  buttonviewContainer: { alignItems: "center", marginBottom: 20 },
   header: {
     position: "absolute",
     top: 130,
@@ -108,14 +91,6 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 10,
   },
-
-  headerText: {
-    color: "#FEF3E2",
-    fontSize: 28,
-  },
-  content: {
-    marginTop: 10,
-    width: "100%",
-    alignItems: "center",
-  },
+  headerText: { color: "#FEF3E2", fontSize: 28 },
+  content: { marginTop: 10, width: "100%", alignItems: "center" },
 });

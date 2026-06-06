@@ -1,11 +1,7 @@
 import React, { useState } from "react";
-import { createUserWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../firebase/firebase";
-import { useDispatch } from "react-redux";
-import { doc, setDoc } from "firebase/firestore"; // Firestore işlemleri için ekledik
-import { db } from "../firebase/firebase"; // Firestore referansı
-import { loginSuccess } from "../redux/authSlice";
-import { updateProfile } from "firebase/auth";  // updateProfile ekle
+import { useNavigation } from "@react-navigation/native";
+import { useTranslation } from 'react-i18next';
+import { registerUser } from "../api/firestore_api"; // kendi API path'ine göre ayarla
 import {
   View,
   Text,
@@ -24,124 +20,118 @@ export default function RegisterScreen({ setIsRegistering }) {
   const [phone, setPhone] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const navigation = useNavigation();
   const [loading, setLoading] = useState(false);
-  const dispatch = useDispatch();
+  const { t } = useTranslation();
 
   const handleRegister = async () => {
-  if (!email || !password) {
-    alert("Email ve şifre zorunlu");
-    return;
-  }
+    if (!name || !email || !password) {
+      alert(t('register.fillRequired'));
+      return;
+    }
 
-  try {
     setLoading(true);
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
+    try {
+      const newUser = {
+        name,
+        surname,
+        phone,
+        email,
+        password,
+        createdAt: new Date().toISOString(),
+        role: "user",
+      };
 
-    await updateProfile(user, {
-      displayName: name,
-    });
-  await setDoc(doc(db, "users", user.uid), {
-  uid: user.uid,
-  name: name,
-  surname: surname,
-  phone: phone,
-  email: email,
-  createdAt: new Date().toISOString(),
-});
-    // ✅ Login ekranına at, otomatik giriş yapma
-    setIsRegistering(false);
-
-  } catch (error) {
-  console.log("HATA KODU:", error.code);
-  console.log("HATA MESAJI:", error.message);
-  alert("Kayıt başarısız: " + error.message);
-}finally {
-    setLoading(false);
-  }
-};
+      await registerUser(newUser);
+      alert(t('register.registerSuccess'));
+      setIsRegistering(false);
+    } catch (error) {
+      console.log(error);
+      alert(t('register.registerError'));
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior="padding">
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={styles.scrollContent}
-      >
+    <KeyboardAvoidingView style={styles.innerContainer} behavior="padding">
+      <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ flexGrow: 1 }}>
         <Image
           source={require("../../assets/belediye_logo2.png")}
-          style={styles.logo}
+          style={styles.topImage}
           resizeMode="contain"
         />
 
-        <Text style={styles.title}>Üye Ol</Text>
+        <View style={styles.overlay}>
+          <View style={styles.container}>
+            <Text style={styles.title}>{t('register.title')}</Text>
 
-        <TextInput
-          placeholder="Ad"
-          placeholderTextColor="#999"
-          style={styles.input}
-          value={name}
-          onChangeText={setName}
-        />
-        <TextInput
-          placeholder="Soyad"
-          placeholderTextColor="#999"
-          style={styles.input}
-          value={surname}
-          onChangeText={setSurname}
-        />
-        <TextInput
-          placeholder="Telefon"
-          placeholderTextColor="#999"
-          style={styles.input}
-          keyboardType="phone-pad"
-          value={phone}
-          onChangeText={setPhone}
-        />
-        <TextInput
-          placeholder="Email"
-          placeholderTextColor="#999"
-          style={styles.input}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          value={email}
-          onChangeText={setEmail}
-        />
-        <TextInput
-          placeholder="Şifre"
-          placeholderTextColor="#999"
-          secureTextEntry
-          style={styles.input}
-          value={password}
-          onChangeText={setPassword}
-        />
+            <TextInput
+              placeholder={t('register.name')}
+              placeholderTextColor="#ccc"
+              style={styles.input}
+              value={name}
+              onChangeText={setName}
+            />
 
-        <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={loading}>
-          {loading ? (
-            <ActivityIndicator color="white" />
-          ) : (
-            <Text style={styles.buttonText}>Kayıt Ol</Text>
-          )}
-        </TouchableOpacity>
+            <TextInput
+              placeholder={t('register.surname')}
+              placeholderTextColor="#ccc"
+              style={styles.input}
+              value={surname}
+              onChangeText={setSurname}
+            />
 
-        <TouchableOpacity onPress={() => setIsRegistering(false)}>
-          <Text style={styles.link}>Zaten hesabın var mı? Giriş Yap</Text>
-        </TouchableOpacity>
+            <TextInput
+              placeholder={t('register.phone')}
+              placeholderTextColor="#ccc"
+              style={styles.input}
+              keyboardType="phone-pad"
+              value={phone}
+              onChangeText={setPhone}
+            />
+
+            <TextInput
+              placeholder={t('register.email')}
+              placeholderTextColor="#ccc"
+              style={styles.input}
+              keyboardType="email-address"
+              value={email}
+              onChangeText={setEmail}
+            />
+
+            <TextInput
+              placeholder={t('register.password')}
+              placeholderTextColor="#ccc"
+              secureTextEntry
+              style={styles.input}
+              value={password}
+              onChangeText={setPassword}
+            />
+
+            <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={loading}>
+              {loading ? (
+                <ActivityIndicator color="white" />
+              ) : (
+                <Text style={styles.buttonText}>{t('register.registerButton')}</Text>
+              )}
+            </TouchableOpacity>
+
+            <TouchableOpacity onPress={() => setIsRegistering(false)}>
+              <Text style={styles.link}>{t('register.alreadyAccount')}</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: "#fff",
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 25,
-    paddingBottom: 40,
-  },
-  logo: {
+  innerContainer: { flex: 1, backgroundColor: "#FFFFFF" },
+  overlay: { paddingHorizontal: 25, paddingBottom: 40 },
+  container: { flex: 1 },
+  topImage: {
     width: 250,
     height: 150,
     alignSelf: "center",
@@ -156,7 +146,7 @@ const styles = StyleSheet.create({
     color: "#504e4e",
   },
   input: {
-    backgroundColor: "#fff",
+    backgroundColor: "#FFFFFF",
     paddingHorizontal: 15,
     paddingVertical: 12,
     borderRadius: 12,
@@ -173,15 +163,6 @@ const styles = StyleSheet.create({
     marginTop: 10,
     elevation: 5,
   },
-  buttonText: {
-    color: "white",
-    fontWeight: "bold",
-    fontSize: 15,
-  },
-  link: {
-    color: "#524a4a",
-    marginTop: 20,
-    textAlign: "center",
-    fontSize: 14,
-  },
+  buttonText: { color: "white", fontWeight: "bold", fontSize: 15 },
+  link: { color: "#524a4a", marginTop: 20, textAlign: "center", fontSize: 14 },
 });

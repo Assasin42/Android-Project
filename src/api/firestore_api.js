@@ -6,6 +6,7 @@ import {
   deleteDoc,
   collection,
   getDocs,
+  addDoc,
 } from "firebase/firestore";
 
 // Kullanıcı verisini oku
@@ -30,6 +31,23 @@ export const updateUser = async (data) => {
 export const deleteUserData = async () => {
   const uid = auth.currentUser?.uid;
   await deleteDoc(doc(db, "users", uid));
+};
+
+// Kullanıcı kaydet (RegisterScreen için)
+export const registerUser = async (userData) => {
+  const usersRef = collection(db, "users");
+  const docRef = await addDoc(usersRef, userData);
+  return { id: docRef.id, ...userData };
+};
+
+// Tüm kullanıcıları getir (LoginScreen için)
+export const getUsers = async () => {
+  const querySnapshot = await getDocs(collection(db, "users"));
+  const list = [];
+  querySnapshot.forEach((doc) => {
+    list.push({ id: doc.id, ...doc.data() });
+  });
+  return { data: list };
 };
 
 // Otobüs hatlarını oku
