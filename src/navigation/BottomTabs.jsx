@@ -7,6 +7,8 @@ import HomeScreen from "../screens/HomeScreen.js";
 import ProfileScreen from "../screens/profileScreen.js";
 import SettingsScreen from "../screens/settingsScreen.js";
 import ChangePasswordScreen from "../screens/ChangePasswordScreen.js";
+import MapScreen from "../screens/MapScreen.js";
+import { AppColors } from "../styles/colors.js";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -15,8 +17,25 @@ function SettingsStack({ route }) {
   const { user, setUserData } = route.params || {};
   return (
     <Stack.Navigator screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="SettingsMain" component={SettingsScreen} initialParams={{ user }} />
+      <Stack.Screen
+        name="SettingsMain"
+        component={SettingsScreen}
+        initialParams={{ user }}
+      />
       <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
+    </Stack.Navigator>
+  );
+}
+function HomeStack({ route }) {
+  const { name } = route.params || {};
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen
+        name="HomeMain"
+        component={HomeScreen}
+        initialParams={{ name }}
+      />
+      <Stack.Screen name="MapScreen" component={MapScreen} />
     </Stack.Navigator>
   );
 }
@@ -25,13 +44,13 @@ export default function TabNavigator({ user, setUserData }) {
   return (
     <Tab.Navigator
       screenOptions={{
-        headerTintColor: "#FEF3E2",
+        headerTintColor: AppColors.light_orange,
         headerTransparent: true,
-        tabBarActiveTintColor: "#FEF3E2",
+        tabBarActiveTintColor: AppColors.light_orange,
         headerStyle: { backgroundColor: "transparent" },
         headerShadowVisible: false,
         tabBarStyle: {
-          backgroundColor: "rgba(0,0,0,0.8)",
+          backgroundColor: AppColors.black0_8,
           position: "absolute",
           elevation: 0,
           borderTopWidth: 0,
@@ -43,12 +62,16 @@ export default function TabNavigator({ user, setUserData }) {
     >
       <Tab.Screen
         name="Duraklar"
-        component={HomeScreen}
+        component={HomeStack}
         initialParams={{ name: user?.name || "Yolcu" }}
         options={{
           headerTitleAlign: "center",
           tabBarIcon: ({ focused }) => (
-            <Ionicons name={focused ? "home-sharp" : "home-outline"} color={"#FEF3E2"} size={30} />
+            <Ionicons
+              name={focused ? "home-sharp" : "home-outline"}
+              color={AppColors.light_orange}
+              size={30}
+            />
           ),
         }}
       />
@@ -58,9 +81,13 @@ export default function TabNavigator({ user, setUserData }) {
         initialParams={{ user, setUserData }}
         options={{
           headerTitleAlign: "center",
-          headerTintColor: "#020102",
+          headerTintColor: AppColors.dark_blue,
           tabBarIcon: ({ focused }) => (
-            <Ionicons name={focused ? "person-sharp" : "person-outline"} color={"#f3f3ee"} size={30} />
+            <Ionicons
+              name={focused ? "person-sharp" : "person-outline"}
+              color={AppColors.light_orange}
+              size={30}
+            />
           ),
         }}
       />
@@ -70,10 +97,14 @@ export default function TabNavigator({ user, setUserData }) {
         initialParams={{ user, setUserData }}
         options={{
           headerShown: false,
-          headerTintColor: "#020102",
+          headerTintColor: AppColors.black3,
           headerTitleAlign: "center",
           tabBarIcon: ({ focused }) => (
-            <Ionicons name={focused ? "settings-sharp" : "settings-outline"} color={"#FEF3E2"} size={30} />
+            <Ionicons
+              name={focused ? "settings-sharp" : "settings-outline"}
+              color={AppColors.light_orange}
+              size={30}
+            />
           ),
         }}
       />

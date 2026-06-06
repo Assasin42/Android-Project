@@ -5,7 +5,8 @@ import { useDispatch } from "react-redux";
 import { doc, setDoc } from "firebase/firestore"; // Firestore işlemleri için ekledik
 import { db } from "../firebase/firebase"; // Firestore referansı
 import { loginSuccess } from "../redux/authSlice";
-import { updateProfile } from "firebase/auth";  // updateProfile ekle
+import { updateProfile } from "firebase/auth"; // updateProfile ekle
+import { AppColors } from "../styles/colors";
 import {
   View,
   Text,
@@ -28,38 +29,41 @@ export default function RegisterScreen({ setIsRegistering }) {
   const dispatch = useDispatch();
 
   const handleRegister = async () => {
-  if (!email || !password) {
-    alert("Email ve şifre zorunlu");
-    return;
-  }
+    if (!email || !password) {
+      alert("Email ve şifre zorunlu");
+      return;
+    }
 
-  try {
-    setLoading(true);
-    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    const user = userCredential.user;
+    try {
+      setLoading(true);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
+      const user = userCredential.user;
 
-    await updateProfile(user, {
-      displayName: name,
-    });
-  await setDoc(doc(db, "users", user.uid), {
-  uid: user.uid,
-  name: name,
-  surname: surname,
-  phone: phone,
-  email: email,
-  createdAt: new Date().toISOString(),
-});
-    // ✅ Login ekranına at, otomatik giriş yapma
-    setIsRegistering(false);
-
-  } catch (error) {
-  console.log("HATA KODU:", error.code);
-  console.log("HATA MESAJI:", error.message);
-  alert("Kayıt başarısız: " + error.message);
-}finally {
-    setLoading(false);
-  }
-};
+      await updateProfile(user, {
+        displayName: name,
+      });
+      await setDoc(doc(db, "users", user.uid), {
+        uid: user.uid,
+        name: name,
+        surname: surname,
+        phone: phone,
+        email: email,
+        createdAt: new Date().toISOString(),
+      });
+      // ✅ Login ekranına at, otomatik giriş yapma
+      setIsRegistering(false);
+    } catch (error) {
+      console.log("HATA KODU:", error.code);
+      console.log("HATA MESAJI:", error.message);
+      alert("Kayıt başarısız: " + error.message);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <KeyboardAvoidingView style={styles.container} behavior="padding">
@@ -77,21 +81,21 @@ export default function RegisterScreen({ setIsRegistering }) {
 
         <TextInput
           placeholder="Ad"
-          placeholderTextColor="#999"
+          placeholderTextColor={AppColors.gray999}
           style={styles.input}
           value={name}
           onChangeText={setName}
         />
         <TextInput
           placeholder="Soyad"
-          placeholderTextColor="#999"
+          placeholderTextColor={AppColors.gray999}
           style={styles.input}
           value={surname}
           onChangeText={setSurname}
         />
         <TextInput
           placeholder="Telefon"
-          placeholderTextColor="#999"
+          placeholderTextColor={AppColors.gray999}
           style={styles.input}
           keyboardType="phone-pad"
           value={phone}
@@ -99,7 +103,7 @@ export default function RegisterScreen({ setIsRegistering }) {
         />
         <TextInput
           placeholder="Email"
-          placeholderTextColor="#999"
+          placeholderTextColor={AppColors.gray999}
           style={styles.input}
           keyboardType="email-address"
           autoCapitalize="none"
@@ -108,16 +112,20 @@ export default function RegisterScreen({ setIsRegistering }) {
         />
         <TextInput
           placeholder="Şifre"
-          placeholderTextColor="#999"
+          placeholderTextColor={AppColors.gray999}
           secureTextEntry
           style={styles.input}
           value={password}
           onChangeText={setPassword}
         />
 
-        <TouchableOpacity style={styles.button} onPress={handleRegister} disabled={loading}>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleRegister}
+          disabled={loading}
+        >
           {loading ? (
-            <ActivityIndicator color="white" />
+            <ActivityIndicator color={AppColors.white} />
           ) : (
             <Text style={styles.buttonText}>Kayıt Ol</Text>
           )}
@@ -134,7 +142,7 @@ export default function RegisterScreen({ setIsRegistering }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: AppColors.white,
   },
   scrollContent: {
     flexGrow: 1,
@@ -153,20 +161,20 @@ const styles = StyleSheet.create({
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 20,
-    color: "#504e4e",
+    color: AppColors.brown2,
   },
   input: {
-    backgroundColor: "#fff",
+    backgroundColor: AppColors.white,
     paddingHorizontal: 15,
     paddingVertical: 12,
     borderRadius: 12,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#EAEAEA",
+    borderColor: AppColors.whiteEa,
     fontSize: 16,
   },
   button: {
-    backgroundColor: "#35393d",
+    backgroundColor: AppColors.gray1_0,
     padding: 15,
     borderRadius: 10,
     alignItems: "center",
@@ -174,12 +182,12 @@ const styles = StyleSheet.create({
     elevation: 5,
   },
   buttonText: {
-    color: "white",
+    color: AppColors.white,
     fontWeight: "bold",
     fontSize: 15,
   },
   link: {
-    color: "#524a4a",
+    color: AppColors.brown,
     marginTop: 20,
     textAlign: "center",
     fontSize: 14,

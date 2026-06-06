@@ -1,6 +1,6 @@
 import { useState } from "react";
-import { useDispatch } from "react-redux";          // ✅ ekle
-import { logout } from "../redux/authSlice";         // ✅ ekle
+import { useDispatch } from "react-redux";
+import { logout } from "../redux/authSlice";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase/firebase";
 import { useSelector } from "react-redux";
@@ -10,15 +10,17 @@ import {
   StyleSheet,
   ImageBackground,
   ScrollView,
-  TouchableOpacity,                                  // ✅ ekle
+  TouchableOpacity,
 } from "react-native";
 import ModalSelect from "../components/modalS";
 import Button from "../components/button";
 import { LinearGradient } from "expo-linear-gradient";
+import LocationButton from "../components/locationButton";
 import { BlurView } from "expo-blur";
 import BusTime from "../components/busTime";
 import { useRoute } from "@react-navigation/native";
-export default function HomeScreen() {
+import { AppColors } from "../styles/colors";
+export default function HomeScreen({ navigation }) {
   const [selectedValue, setSelectedValue] = useState(null);
   const [showBus, setShowBus] = useState(false);
   const dispatch = useDispatch();
@@ -31,9 +33,9 @@ export default function HomeScreen() {
       setSelectedValue(null);
     }
   };
-  
-  // EKLE
-const user = useSelector((state) => state.auth.user);
+
+  const route = useRoute();
+  const user = useSelector((state) => state.auth.user);
   const options = [
     { label: "Sema Doğan", value: "Sema Doğan" },
     { label: "Hastane", value: "Hastane" },
@@ -50,12 +52,14 @@ const user = useSelector((state) => state.auth.user);
       style={styles.container}
     >
       <LinearGradient
-        colors={["rgba(0,0,0,0.6)", "transparent"]}
+        colors={[AppColors.black0_6, "transparent"]}
         style={StyleSheet.absoluteFill}
       />
 
       <BlurView intensity={10} borderRadius={30} style={styles.header}>
-        <Text style={styles.headerText}>Hoşgeldiniz {user?.displayName || "Yolcu"}</Text>
+        <Text style={styles.headerText}>
+          Hoşgeldiniz {user?.displayName || "Yolcu"}
+        </Text>
       </BlurView>
 
       <View style={styles.content}>
@@ -65,13 +69,19 @@ const user = useSelector((state) => state.auth.user);
             value={selectedValue}
             onSelect={(value) => setSelectedValue(value)}
           />
-
         </View>
 
         <View style={styles.buttonviewContainer}>
           <Button label="Seç" theme="primary" onPress={secButton} />
         </View>
         {showBus && <BusTime />}
+      </View>
+      <View style={styles.buttonviewContainer}>
+        <LocationButton
+          label="Konumdan Seç"
+          theme="primary"
+          onPress={() => navigation.navigate("MapScreen")}
+        />
       </View>
     </ImageBackground>
   );
@@ -85,7 +95,7 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 20,
-    color: "#0000",
+    color: AppColors.black,
     position: "absolute",
     top: 30,
     left: 20,
@@ -104,13 +114,13 @@ const styles = StyleSheet.create({
     top: 130,
     left: 20,
     right: 20,
-    backgroundColor: "rgba(0,0,0,0.3)",
+    backgroundColor: AppColors.black0_3,
     padding: 10,
     borderRadius: 10,
   },
 
   headerText: {
-    color: "#FEF3E2",
+    color: AppColors.light_orange,
     fontSize: 28,
   },
   content: {

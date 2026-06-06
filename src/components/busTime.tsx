@@ -1,8 +1,15 @@
-import { StyleSheet, View, Text, Pressable, ScrollView, ActivityIndicator } from "react-native";
+import {
+  StyleSheet,
+  View,
+  Text,
+  Pressable,
+  ScrollView,
+  ActivityIndicator,
+} from "react-native";
 import Feather from "@expo/vector-icons/Feather";
 import { useEffect, useState } from "react";
 import { getBusLines } from "../api/firestore_api";
-
+import { AppColors } from "../styles/colors";
 
 type BusLine = {
   id: string;
@@ -10,8 +17,6 @@ type BusLine = {
   time?: string;
   stops?: string[];
 };
-
-// useState'i şöyle güncelle:
 
 export default function BusTime() {
   const [busList, setBusList] = useState<BusLine[]>([]);
@@ -33,7 +38,7 @@ export default function BusTime() {
   }, []);
 
   if (loading) {
-    return <ActivityIndicator size="large" color="#1A3263" />;
+    return <ActivityIndicator size="large" color={AppColors.dark_blue} />;
   }
 
   return (
@@ -48,7 +53,7 @@ export default function BusTime() {
             <Pressable style={styles.busTimeButton}>
               <Text style={styles.buttonText}>{bus.name}</Text>
               <View style={styles.timeContainer}>
-                <Feather name="clock" size={18} color={"#1A3263"} />
+                <Feather name="clock" size={18} color={AppColors.dark_blue} />
                 <Text style={styles.buttonText}>{bus.time ?? "-"}</Text>
               </View>
             </Pressable>
@@ -72,10 +77,10 @@ const styles = StyleSheet.create({
     justifyContent: "space-between",
     flexDirection: "row",
     paddingHorizontal: 10,
-    backgroundColor: "#FEF3E2",
+    backgroundColor: AppColors.light_orange,
   },
   buttonText: {
-    color: "#1A3263",
+    color: AppColors.dark_blue,
     fontSize: 16,
   },
   Abuttons: {

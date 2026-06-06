@@ -1,13 +1,13 @@
+import React from "react";
 import { StyleSheet, View, Pressable, Text } from "react-native";
-import { FontAwesome } from "@expo/vector-icons";
 import { AppColors } from "../styles/colors";
+import { FontAwesome } from "@expo/vector-icons";
 type Props = {
   label: string;
   theme?: "primary";
   onPress?: () => void;
 };
-
-export default function Button({ label, theme, onPress }: Props) {
+export default function LocationButton({ label, theme, onPress }: Props) {
   if (theme == "primary") {
     return (
       <View style={[styles.buttonContainer]}>
@@ -16,7 +16,7 @@ export default function Button({ label, theme, onPress }: Props) {
           onPress={onPress}
         >
           <FontAwesome
-            name="bus"
+            name="location-arrow"
             size={18}
             color={AppColors.dark_blue}
             style={styles.buttonIcon}

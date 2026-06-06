@@ -6,19 +6,19 @@ import {
   Text,
   View,
 } from "react-native";
-
+import { AppColors } from "../styles/colors";
 import React, { useState } from "react";
 import { FontAwesome } from "@expo/vector-icons";
 type Option = {
   label: string;
   value: string | null;
-  onSelect: (value: string) => void;
+  onSelect: (value: string | null) => void;
 };
 
 type Props = {
   options: Option[];
   value: string | null;
-  onSelect: (value: string) => void;
+  onSelect: (value: string | null) => void;
 };
 
 export default function ModalSelect({ options, value, onSelect }: Props) {
@@ -70,7 +70,7 @@ export default function ModalSelect({ options, value, onSelect }: Props) {
 const styles = StyleSheet.create({
   selector: {
     padding: 12,
-    backgroundColor: "#1A3263",
+    backgroundColor: AppColors.dark_blue,
     borderRadius: 60,
     flexDirection: "row",
     width: 400,
@@ -78,32 +78,32 @@ const styles = StyleSheet.create({
   },
   selectorIcon: {
     paddingRight: 8,
-    color: "white",
+    color: AppColors.white,
   },
   selectorText: {
     fontSize: 16,
-    color: "white",
+    color: AppColors.white,
   },
   modalOverlay: {
     flex: 1,
     justifyContent: "center",
-    backgroundColor: "rgba(0,0,0,0.5)",
+    backgroundColor: AppColors.black0_5,
   },
   modalContent: {
     margin: 20,
-    backgroundColor: "#1A3263",
+    backgroundColor: AppColors.dark_blue,
     borderRadius: 10,
     padding: 20,
   },
   option: {
     padding: 12,
     borderBottomWidth: 1,
-    borderColor: "white",
-    backgroundColor: "#1A3263",
+    borderColor: AppColors.white,
+    backgroundColor: AppColors.dark_blue,
   },
   optionText: {
     fontSize: 16,
-    color: "white",
+    color: AppColors.white,
   },
   closeButton: {
     marginTop: 10,

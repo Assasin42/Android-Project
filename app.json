@@ -20,13 +20,26 @@
         "foregroundImage": "./assets/android-icon-foreground.png",
         "backgroundImage": "./assets/android-icon-background.png",
         "monochromeImage": "./assets/android-icon-monochrome.png"
-      }
+      },
+      "package": "com.messi10kaya.navigationandbottomtabs"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
-      "expo-secure-store"
-    ]
+      "expo-secure-store",
+      [
+        "react-native-maps",
+        {
+          "googleMapsApiKey": "AIzaSyCBeGZv26TEdlRWevS_-oJRL9rRJNaPFDg"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "94fd2765-6bb5-4b28-bc14-14899e8a1393"
+      }
+    },
+    "owner": "messi10kaya"
   }
 }

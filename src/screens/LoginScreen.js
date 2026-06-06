@@ -3,7 +3,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase/firebase";
 import { useDispatch } from "react-redux";
 import { loginSuccess } from "../redux/authSlice";
-
+import { AppColors } from "../styles/colors";
 
 import {
   View,
@@ -30,16 +30,21 @@ export default function LoginScreen({ setIsRegistering }) {
 
     try {
       setLoading(true);
-      const userCredential = await signInWithEmailAndPassword(auth, email, password);
+      const userCredential = await signInWithEmailAndPassword(
+        auth,
+        email,
+        password,
+      );
       const user = userCredential.user;
 
       // Redux'a kullanıcı bilgisini kaydet (persist ile saklanacak)
-      dispatch(loginSuccess({
-        uid: user.uid,
-        email: user.email,
-        displayName: user.displayName,
-      }));
-
+      dispatch(
+        loginSuccess({
+          uid: user.uid,
+          email: user.email,
+          displayName: user.displayName,
+        }),
+      );
     } catch (error) {
       console.log(error);
       alert("Email veya şifre yanlış");
@@ -61,7 +66,7 @@ export default function LoginScreen({ setIsRegistering }) {
 
       <TextInput
         placeholder="Email"
-        placeholderTextColor="#999"
+        placeholderTextColor={AppColors.gray999}
         keyboardType="email-address"
         style={styles.input}
         value={email}
@@ -71,14 +76,18 @@ export default function LoginScreen({ setIsRegistering }) {
 
       <TextInput
         placeholder="Şifre"
-        placeholderTextColor="#999"
+        placeholderTextColor={AppColors.gray999}
         secureTextEntry
         style={styles.input}
         value={password}
         onChangeText={setPassword}
       />
 
-      <TouchableOpacity style={styles.button} onPress={handleLogin} disabled={loading}>
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleLogin}
+        disabled={loading}
+      >
         {loading ? (
           <ActivityIndicator color="white" />
         ) : (
@@ -96,7 +105,7 @@ export default function LoginScreen({ setIsRegistering }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: AppColors.white,
     paddingHorizontal: 25,
     justifyContent: "center",
   },
@@ -110,26 +119,26 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: "bold",
     textAlign: "center",
-    color: "#35393d",
+    color: AppColors.gray1_0,
   },
   subtitle: {
     fontSize: 14,
     textAlign: "center",
-    color: "#504e4e",
+    color: AppColors.brown2,
     marginBottom: 30,
   },
   input: {
-    backgroundColor: "#fff",
+    backgroundColor: AppColors.white,
     paddingHorizontal: 15,
     paddingVertical: 12,
     borderRadius: 12,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: "#EAEAEA",
+    borderColor: AppColors.white,
     fontSize: 16,
   },
   button: {
-    backgroundColor: "#35393d",
+    backgroundColor: AppColors.gray1_0,
     padding: 15,
     borderRadius: 10,
     alignItems: "center",
@@ -142,7 +151,7 @@ const styles = StyleSheet.create({
     fontSize: 15,
   },
   link: {
-    color: "#524a4a",
+    color: AppColors.brown,
     marginTop: 20,
     textAlign: "center",
     fontSize: 14,
