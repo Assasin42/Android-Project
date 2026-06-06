@@ -4,22 +4,37 @@ import { Dimensions, Platform, StyleSheet, Text, TouchableOpacity, View } from '
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { moderateScale, scale, verticalScale } from 'react-native-size-matters';
 import { useNavigation, useRoute } from '@react-navigation/native';
-
-const { width, height } = Dimensions.get('window');
-
-const settingsOptions = [
-  { id: '1', name: 'Bildirim Ayarları', icon: 'notifications-outline', color: '#FF9500', bgColor: '#FFF4E5' },
-  { id: '2', name: 'Şifre Değiştir', icon: 'shield-checkmark-outline', color: '#34C759', bgColor: '#E8F9EE' },
-  { id: '3', name: 'Dil Seçenekleri', icon: 'globe-outline', color: '#5856D6', bgColor: '#EFEEFA' },
-  { id: '4', name: 'Karanlık Mod', icon: 'moon-outline', color: '#1C1C1E', bgColor: '#F2F2F7' },
-  { id: '5', name: 'Yardım ve Destek', icon: 'help-circle-outline', color: '#FF2D55', bgColor: '#FFE9ED' },
-];
-
+import { useTranslation } from 'react-i18next';
+import { openLanguageSheet } from '../components/LanguageSheet';
+ 
+const { width } = Dimensions.get('window');
+ 
 export default function SettingsScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const { user } = route.params || {};
-
+  const { t } = useTranslation();
+ 
+  // Ayar seçenekleri artık t() ile çekiliyor
+  const settingsOptions = [
+    { id: '1', name: t('settings.notifications'),   icon: 'notifications-outline',    color: '#FF9500', bgColor: '#FFF4E5' },
+    { id: '2', name: t('settings.changePassword'),  icon: 'shield-checkmark-outline', color: '#34C759', bgColor: '#E8F9EE' },
+    { id: '3', name: t('settings.language'),         icon: 'globe-outline',            color: '#5856D6', bgColor: '#EFEEFA' },
+    { id: '4', name: t('settings.darkMode'),         icon: 'moon-outline',             color: '#1C1C1E', bgColor: '#F2F2F7' },
+    { id: '5', name: t('settings.helpSupport'),      icon: 'help-circle-outline',      color: '#FF2D55', bgColor: '#FFE9ED' },
+  ];
+ 
+  const handlePress = (item) => {
+    if (item.id === '2') {
+      navigation.navigate('ChangePassword', { user });
+    } else if (item.id === '3') {
+      // Dil seçimi sheet'ini aç
+      openLanguageSheet();
+    } else {
+      console.log(`${item.name} tıklandı`);
+    }
+  };
+ 
   return (
     <SafeAreaView style={styles.container}>
       <View style={styles.header}>
@@ -27,31 +42,23 @@ export default function SettingsScreen() {
           <Ionicons name="chevron-back" size={24} color="black" />
         </TouchableOpacity>
       </View>
-
+ 
       <View style={styles.content}>
-        <Text style={styles.sectionTitle}>Hesap ve Uygulama</Text>
-
+        <Text style={styles.sectionTitle}>{t('settings.sectionTitle')}</Text>
+ 
         <View style={styles.card}>
           {settingsOptions.map((item, index) => (
             <View key={item.id}>
-              <TouchableOpacity 
-                style={styles.listItem} 
-                activeOpacity={0.7} 
-                onPress={() => {
-                  if (item.name === 'Şifre Değiştir') {
-                    navigation.navigate('ChangePassword');
-                  } else {
-                    console.log(`${item.name} tıklandı`);
-                  }
-                }}
+              <TouchableOpacity
+                style={styles.listItem}
+                activeOpacity={0.7}
+                onPress={() => handlePress(item)}
               >
                 <View style={styles.itemLeft}>
                   <View style={[styles.iconCircle, { backgroundColor: item.bgColor }]}>
                     <Ionicons name={item.icon} size={22} color={item.color} />
                   </View>
-                  <Text style={[styles.itemText, { color: '#333' }]}> 
-                    {item.name}
-                  </Text>
+                  <Text style={styles.itemText}>{item.name}</Text>
                 </View>
                 <Ionicons name="chevron-forward" size={20} color="#000000f8" />
               </TouchableOpacity>
@@ -63,7 +70,7 @@ export default function SettingsScreen() {
     </SafeAreaView>
   );
 }
-
+ 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F9F9FB' },
   header: {
@@ -97,6 +104,6 @@ const styles = StyleSheet.create({
     width: scale(40), height: scale(40), borderRadius: scale(20),
     justifyContent: 'center', alignItems: 'center', marginRight: scale(15),
   },
-  itemText: { fontSize: 15, color: '#8E8E93', fontWeight: '500' },
+  itemText: { fontSize: 15, color: '#333', fontWeight: '500' },
   separator: { height: 1, backgroundColor: '#F2F2F7', marginHorizontal: 15 },
 });

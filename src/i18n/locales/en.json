@@ -1,0 +1,88 @@
+{
+  "common": {
+    "close": "Close",
+    "loading": "Loading..."
+  },
+  "login": {
+    "title": "GÜMÜŞHANE",
+    "subtitle": "SMART TRANSPORTATION SYSTEM",
+    "email": "Email",
+    "password": "Password",
+    "loginButton": "Login",
+    "noAccount": "Don't have an account? Sign Up",
+    "emailRequired": "Email and password are required",
+    "wrongCredentials": "Email or password is incorrect"
+  },
+  "register": {
+    "title": "Sign Up",
+    "name": "First Name",
+    "surname": "Last Name",
+    "phone": "Phone",
+    "email": "Email",
+    "password": "Password",
+    "registerButton": "Register",
+    "alreadyAccount": "Already have an account? Login",
+    "emailRequired": "Email and password are required",
+    "failed": "Registration failed",
+    "registerSuccess": "Registration successful!"
+  },
+  "home": {
+    "welcome": "Welcome",
+    "passenger": "Passenger",
+    "selectStop": "Select Your Stop",
+    "select": "Select",
+    "noStop": "Please select a stop.",
+    "stops": {
+      "semaDogan": "Sema Doğan",
+      "hospital": "Hospital",
+      "university": "University",
+      "market": "Market",
+      "busStation": "Bus Station",
+      "zeynepAna": "Zeynep Ana",
+      "tepeYurt": "Tepe Yurt",
+      "teachersHouse": "Teachers' House"
+    }
+  },
+  "profile": {
+    "notificationSettings": "Line Notification Settings",
+    "about": "About the App",
+    "feedback": "Contact Us / Feedback",
+    "logout": "Logout",
+    "deleteAccount": "Delete Account",
+    "deleteSuccess": "Your account has been successfully deleted.",
+    "deleteError": "An error occurred while deleting the account.",
+    "logoutError": "Logout failed",
+    "reauthRequired": "You need to log in again to delete the account.",
+    "aboutApp": "About the Application",
+    "contactUs": "Contact Us",
+    "memberSince": "Member since",
+    "lineNotifications": "Line Notifications"
+  },
+  "settings": {
+    "sectionTitle": "Account & App",
+    "notifications": "Notification Settings",
+    "changePassword": "Change Password",
+    "language": "Language Options",
+    "darkMode": "Dark Mode",
+    "helpSupport": "Help & Support",
+    "selectLanguage": "Select Language",
+    "turkish": "Türkçe",
+    "english": "English"
+  },
+  "changePassword": {
+    "title": "Change Password",
+    "currentPassword": "Current Password",
+    "newPassword": "New Password",
+    "confirmPassword": "New Password (Repeat)",
+    "updateButton": "Update Password",
+    "fillAll": "Please fill in all fields.",
+    "notMatch": "New passwords don't match.",
+    "wrongCurrent": "Current password is incorrect.",
+    "success": "Password updated successfully!",
+    "error": "An error occurred while updating the password.",
+    "changePassword": "Change Password"
+  },
+  "lines": {
+    "title": "Lines"
+  }
+}

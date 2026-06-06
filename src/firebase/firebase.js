@@ -3,6 +3,7 @@ import { initializeAuth, getReactNativePersistence, getAuth } from "firebase/aut
 import { getFirestore } from "firebase/firestore";
 import { getApps, getApp } from "firebase/app";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { createUserWithEmailAndPassword } from "firebase/auth";
 
 const firebaseConfig = {
   apiKey: "AIzaSyCOYbPpiK9n6j1qw_n1_s47_QVGGk3MsvU",
@@ -23,8 +24,9 @@ if (getApps().length === 0) {
   });
 } else {
   app = getApp();
-  auth = getAuth(app);  // ✅ zaten başlatılmış, sadece al
+  auth = getAuth(app);  
 }
 
 export { auth };
 export const db = getFirestore(app);
+

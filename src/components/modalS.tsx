@@ -9,10 +9,10 @@ import {
 
 import React, { useState } from "react";
 import { FontAwesome } from "@expo/vector-icons";
+
 type Option = {
   label: string;
   value: string | null;
-  onSelect: (value: string) => void;
 };
 
 type Props = {
@@ -22,13 +22,16 @@ type Props = {
 };
 
 export default function ModalSelect({ options, value, onSelect }: Props) {
-  const [visible, setVisible] = useState<boolean>(false);
+  const [visible, setVisible] = useState(false);
+
   const selectedText = value ?? "Bulunduğunuz Durağı Seçiniz";
 
   const handleSelect = (item: Option) => {
+    if (!item.value) return; // null güvenliği
     onSelect(item.value);
     setVisible(false);
   };
+
   return (
     <View>
       <Pressable style={styles.selector} onPress={() => setVisible(true)}>
@@ -44,9 +47,9 @@ export default function ModalSelect({ options, value, onSelect }: Props) {
               style={{ maxHeight: 200 }}
               showsVerticalScrollIndicator={true}
             >
-              {options.map((item) => (
+              {options.map((item, index) => (
                 <Pressable
-                  key={item.value}
+                  key={item.value ?? index.toString()}
                   style={styles.option}
                   onPress={() => handleSelect(item)}
                 >
@@ -54,11 +57,12 @@ export default function ModalSelect({ options, value, onSelect }: Props) {
                 </Pressable>
               ))}
             </ScrollView>
+
             <Pressable
               style={styles.closeButton}
               onPress={() => setVisible(false)}
             >
-              <Text>Kapat</Text>
+              <Text style={{ color: "white" }}>Kapat</Text>
             </Pressable>
           </View>
         </View>
