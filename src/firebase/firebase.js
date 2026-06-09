@@ -3,6 +3,7 @@ import { initializeAuth, getReactNativePersistence, getAuth } from "firebase/aut
 import { getFirestore } from "firebase/firestore";
 import { getApps, getApp } from "firebase/app";
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import { getStorage } from "firebase/storage"; // 1. BUNU EKLE
 
 const firebaseConfig = {
   apiKey: "AIzaSyCOYbPpiK9n6j1qw_n1_s47_QVGGk3MsvU",
@@ -28,3 +29,4 @@ if (getApps().length === 0) {
 
 export { auth };
 export const db = getFirestore(app);
+export const storage = getStorage(app); // 2. BUNU DIŞA AKTAR

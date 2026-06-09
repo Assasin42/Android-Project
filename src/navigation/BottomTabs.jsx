@@ -8,6 +8,7 @@ import ProfileScreen from "../screens/profileScreen.js";
 import SettingsScreen from "../screens/settingsScreen.js";
 import ChangePasswordScreen from "../screens/ChangePasswordScreen.js";
 import MapScreen from "../screens/MapScreen.js";
+import CameraScreen from "../screens/CameraScreen.js"; // 1. EKLENDİ: Kamera ekranını import ettik
 import { AppColors } from "../styles/colors.js";
 
 const Tab = createBottomTabNavigator();
@@ -26,6 +27,7 @@ function SettingsStack({ route }) {
     </Stack.Navigator>
   );
 }
+
 function HomeStack({ route }) {
   const { name } = route.params || {};
   return (
@@ -36,6 +38,20 @@ function HomeStack({ route }) {
         initialParams={{ name }}
       />
       <Stack.Screen name="MapScreen" component={MapScreen} />
+      
+      {/* 2. EKLENDİ: Kamera Ekranını buraya gizli bir rota olarak tanımladık */}
+      {/* Kullanıcının geri dönebilmesi için bu ekranda üst başlığı (Header) görünür yaptık */}
+      <Stack.Screen 
+        name="CameraScreen" 
+        component={CameraScreen} 
+        options={{ 
+          headerShown: true, 
+          title: "Kamera İşlemleri",
+          headerTintColor: AppColors.light_orange,
+          headerStyle: { backgroundColor: AppColors.black0_8 },
+          headerTransparent: false
+        }}
+      />
     </Stack.Navigator>
   );
 }
@@ -65,7 +81,7 @@ export default function TabNavigator({ user, setUserData }) {
         component={HomeStack}
         initialParams={{ name: user?.name || "Yolcu" }}
         options={{
-          headerTitleAlign: "center",
+          headerShown: false,
           tabBarIcon: ({ focused }) => (
             <Ionicons
               name={focused ? "home-sharp" : "home-outline"}
