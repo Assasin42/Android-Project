@@ -22,7 +22,10 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "package": "com.messi10kaya.navigationandbottomtabs",
-      "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"],
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ],
       "config": {
         "googleMaps": {
           "apiKey": "AIzaSyBwL5mX1K6uciDTqCQYLfxIEf862lKeHm4"
@@ -39,7 +42,8 @@
         {
           "googleMapsApiKey": "AIzaSyBwL5mX1K6uciDTqCQYLfxIEf862lKeHm4"
         }
-      ]
+      ],
+      "expo-localization"
     ],
     "extra": {
       "eas": {
