@@ -34,7 +34,7 @@
     "select": "Seç",
     "noStop": "Lütfen bir durak seçiniz.",
     "selectFromLocation": "Konumdan Seç",
-    "selectStopPlaceholder": "Select Your Current Stop",
+    "selectStopPlaceholder": "Bulunduğunuz Durağı Seçiniz",
     "menu": "Menü",
     "stops": {
       "semaDogan": "Sema Doğan",
