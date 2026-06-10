@@ -107,6 +107,7 @@ export default function HomeScreen({ navigation }) {
               options={options}
               value={selectedValue}
               onSelect={(value) => setSelectedValue(value)}
+              placeholder={t("home.selectStopPlaceholder")}
             />
           </View>
 

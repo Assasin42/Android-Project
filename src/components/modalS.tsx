@@ -7,6 +7,7 @@ import {
   View,
 } from "react-native";
 import { AppColors } from "../styles/colors";
+import { useTranslation } from "react-i18next";
 import React, { useState } from "react";
 import { FontAwesome } from "@expo/vector-icons";
 type Option = {
@@ -19,11 +20,12 @@ type Props = {
   options: Option[];
   value: string | null;
   onSelect: (value: string | null) => void;
+  placeholder: string; 
 };
 
-export default function ModalSelect({ options, value, onSelect }: Props) {
+export default function ModalSelect({ options, value, onSelect, placeholder }: Props) {
   const [visible, setVisible] = useState<boolean>(false);
-  const selectedText = value ?? "Bulunduğunuz Durağı Seçiniz";
+  const selectedText = value ?? placeholder;
 
   const handleSelect = (item: Option) => {
     onSelect(item.value);

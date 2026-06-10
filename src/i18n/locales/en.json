@@ -34,6 +34,7 @@
     "select": "Select",
     "noStop": "Please select a stop.",
     "selectFromLocation": "Select from Map",
+    "selectStopPlaceholder": "Select Your Current Stop",
     "menu": "Menu",
     "stops": {
       "semaDogan": "Sema Doğan",
