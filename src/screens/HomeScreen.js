@@ -3,7 +3,8 @@ import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import useTheme from "../hooks/useTheme";
 import DrawerButton from "../components/drawerButton";
-import {AppColors} from "../styles/colors";
+import GpsButton from "../components/GpsButton"; // Eklendi
+import * as Location from "expo-location";       // Eklendi
 
 import {
   Text,
@@ -64,6 +65,39 @@ export default function HomeScreen({ navigation }) {
       }
     }, [user?.uid])
   );
+
+  const openMap = async () => {
+  try {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== 'granted') {
+      Alert.alert(t("home.locationPermission"));
+      return;
+    }
+
+    // Servis açık mı?
+    let enabled = false;
+    try {
+      enabled = await Location.hasServicesEnabledAsync();
+    } catch (e) {
+      // hata durumunda varsayalım ki açık değil
+    }
+    if (!enabled) {
+      Alert.alert(t("home.enableLocation"));
+      return;
+    }
+
+    // Daha sağlıklı konum alma
+    const location = await Location.getCurrentPositionAsync({
+      accuracy: Location.Accuracy.Balanced,
+    });
+    navigation.navigate("MapScreen", {
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+    });
+  } catch (error) {
+    Alert.alert(t("home.locationError"), error.message);
+  }
+};
 
   const toggleDrawer = () => {
     if (isDrawerOpen) {
@@ -173,12 +207,23 @@ export default function HomeScreen({ navigation }) {
           {showBus && <BusTime />}
         </View>
 
+        {/* LocationButton artık sabit koordinatla MapScreen’e yönlendiriyor (ilk koddaki gibi) */}
         <View style={styles.buttonviewContainer}>
           <LocationButton
             label={t("home.selectFromLocation")}
             theme="primary"
-            onPress={() => navigation.navigate("MapScreen")}
+            onPress={() =>
+              navigation.navigate("MapScreen", {
+                latitude: 40.4378,
+                longitude: 39.5172,
+              })
+            }
           />
+        </View>
+
+        {/* Eklendi: GpsButton ile anlık konum alıp haritaya gitme */}
+        <View style={styles.gpsbutton}>
+          <GpsButton onPress={openMap} />
         </View>
       </ImageBackground>
 
@@ -197,7 +242,6 @@ export default function HomeScreen({ navigation }) {
           <Text style={styles.drawerTitle}>{t("home.menu")}</Text>
         </View>
 
-        {/* Profil fotoğrafı - tıklanabilir */}
         <View style={styles.drawerPhotoContainer}>
           <TouchableOpacity
             onPress={() => {
@@ -229,7 +273,6 @@ export default function HomeScreen({ navigation }) {
           </Text>
         </View>
 
-        {/* Profil */}
         <TouchableOpacity
           style={styles.drawerItem}
           onPress={() => {
@@ -246,7 +289,6 @@ export default function HomeScreen({ navigation }) {
           <Text style={styles.drawerItemText}>{t("home.profile")}</Text>
         </TouchableOpacity>
 
-        {/* Ayarlar */}
         <TouchableOpacity
           style={styles.drawerItem}
           onPress={() => {
@@ -263,7 +305,6 @@ export default function HomeScreen({ navigation }) {
           <Text style={styles.drawerItemText}>{t("home.settings")}</Text>
         </TouchableOpacity>
 
-        {/* Çıkış Yap */}
         <TouchableOpacity
           style={styles.drawerItem}
           onPress={() => {
@@ -326,6 +367,12 @@ const createStyles = (colors) =>
       marginTop: 10,
       width: "100%",
       alignItems: "center",
+    },
+    // Yeni eklenen GpsButton stili
+    gpsbutton: {
+      position: "absolute",
+      bottom: 90,
+      right: 10,
     },
     overlay: {
       ...StyleSheet.absoluteFillObject,

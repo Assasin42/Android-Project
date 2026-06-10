@@ -8,7 +8,9 @@ import { View, ActivityIndicator } from "react-native";
 import LoginScreen from "./src/screens/LoginScreen";
 import RegisterScreen from "./src/screens/RegisterScreen";
 import TabNavigator from "./src/navigation/BottomTabs";
-import "./src/i18n/i18nConfig"; 
+
+// i18n ve action sheet eklentileri
+import "./src/i18n/i18nConfig";
 import { SheetProvider } from "react-native-actions-sheet";
 import "./src/components/LanguageSheet";
 
@@ -34,16 +36,22 @@ export default function App() {
   return (
     <Provider store={store}>
       <SheetProvider>
-      <PersistGate
-        loading={
-          <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-            <ActivityIndicator size="large" />
-          </View>
-        }
-        persistor={persistor}
-      >
-        <AppNavigator />
-      </PersistGate>
+        <PersistGate
+          loading={
+            <View
+              style={{
+                flex: 1,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <ActivityIndicator size="large" />
+            </View>
+          }
+          persistor={persistor}
+        >
+          <AppNavigator />
+        </PersistGate>
       </SheetProvider>
     </Provider>
   );
