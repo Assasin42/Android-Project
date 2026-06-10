@@ -11,6 +11,8 @@ import MapScreen from "../screens/MapScreen.js";
 import CameraScreen from "../screens/CameraScreen.js";
 import { AppColors } from "../styles/colors.js";
 import { useTranslation } from "react-i18next";
+import NotificationSettingsScreen from '../screens/NotificationSettingsScreen';
+import HelpSupportScreen from '../screens/HelpSupportScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -25,6 +27,8 @@ function SettingsStack({ route }) {
         initialParams={{ user }}
       />
       <Stack.Screen name="ChangePassword" component={ChangePasswordScreen} />
+      <Stack.Screen name="NotificationSettings" component={NotificationSettingsScreen} />
+      <Stack.Screen name="HelpSupport" component={HelpSupportScreen} />
     </Stack.Navigator>
   );
 }

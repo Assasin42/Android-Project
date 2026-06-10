@@ -18,7 +18,6 @@ import { useDispatch } from "react-redux";
 import { toggleTheme } from "../redux/themeSlice";
 import useTheme from "../hooks/useTheme";
 
-
 const { width } = Dimensions.get("window");
 
 export default function SettingsScreen() {
@@ -70,6 +69,10 @@ export default function SettingsScreen() {
 
   const handlePress = (itemId) => {
     switch (itemId) {
+      case "notifications":
+        // Bildirim Ayarları ekranına yönlendiriyoruz
+        navigation.navigate("NotificationSettings");
+        break;
       case "changePassword":
         navigation.navigate("ChangePassword");
         break;
@@ -78,6 +81,10 @@ export default function SettingsScreen() {
         break;
       case "darkMode":
         dispatch(toggleTheme());
+        break;
+      case "helpSupport":
+        // Yardım ve Destek ekranına yönlendiriyoruz
+        navigation.navigate("HelpSupport");
         break;
       default:
         console.log(`${itemId} tıklandı`);
