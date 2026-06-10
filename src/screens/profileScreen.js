@@ -8,8 +8,8 @@ import {
   Image,
   Alert,
 } from "react-native";
-import React, { useState, useEffect } from "react";
-import { useNavigation } from "@react-navigation/native";
+import React, { useState, useEffect, useCallback } from "react";
+import { useNavigation, useFocusEffect } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
 import { useDispatch, useSelector } from "react-redux";
 import { logout } from "../redux/authSlice";
@@ -17,23 +17,42 @@ import { signOut, deleteUser } from "firebase/auth";
 import { auth } from "../firebase/firebase";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { db } from "../firebase/firebase";
-import { doc, deleteDoc } from "firebase/firestore";
+import { doc, deleteDoc, getDoc } from "firebase/firestore";
 import * as ImagePicker from "expo-image-picker";
 import { useTranslation } from "react-i18next";
 import useTheme from "../hooks/useTheme";
 
 export default function ProfileScreen() {
   const navigation = useNavigation();
-  const { colors } = useTheme();
+  const { colors, isDark } = useTheme();
   const styles = createStyles(colors);
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
   const { t } = useTranslation();
   const [imageUri, setImageUri] = useState(null);
+  const [firebasePhoto, setFirebasePhoto] = useState(null);
 
-  useEffect(() => {
-    if (user?.photoURL) setImageUri(user.photoURL);
-  }, [user]);
+  // Firebase'den fotoğraf yükleme - sayfa her odaklandığında çalışır
+  useFocusEffect(
+    useCallback(() => {
+      const loadPhotoFromFirestore = async () => {
+        try {
+          const docRef = doc(db, "users", user.uid, "photos", "profile");
+          const docSnap = await getDoc(docRef);
+          if (docSnap.exists()) {
+            setFirebasePhoto(docSnap.data().uri);
+            setImageUri(docSnap.data().uri);
+          }
+        } catch (error) {
+          console.log("Fotoğraf yükleme hatası:", error);
+        }
+      };
+
+      if (user?.uid) {
+        loadPhotoFromFirestore();
+      }
+    }, [user?.uid])
+  );
 
   const handleOpenCamera = async () => {
     const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
@@ -86,13 +105,13 @@ export default function ProfileScreen() {
 
   const menuItems = [
     { key: "notifications", label: t("profile.notificationSettings") },
-    { key: "about",         label: t("profile.about") },
-    { key: "feedback",      label: t("profile.feedback") },
+    { key: "about", label: t("profile.about") },
+    { key: "feedback", label: t("profile.feedback") },
   ];
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar style={colors.isDark ? "light" : "dark"} />
+      <StatusBar style={isDark ? "light" : "dark"} />
 
       {/* Üst bar */}
       <View style={styles.topBar}>
@@ -105,7 +124,6 @@ export default function ProfileScreen() {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-
         {/* Fotoğraf bölümü */}
         <View style={styles.cameraSection}>
           {!imageUri ? (
@@ -146,7 +164,6 @@ export default function ProfileScreen() {
           )}
         </View>
 
-        {/* Kullanıcı bilgisi */}
         <View style={styles.header}>
           <Text style={styles.userName}>
             {user?.displayName || t("profile.defaultUser")}
@@ -181,7 +198,6 @@ export default function ProfileScreen() {
           </TouchableOpacity>
         </View>
 
-        {/* Hesap sil butonu */}
         <View style={styles.footer}>
           <TouchableOpacity
             style={styles.deleteButton}
@@ -207,7 +223,7 @@ const createStyles = (colors) =>
   StyleSheet.create({
     container: {
       flex: 1,
-      backgroundColor: colors.background,      // ✅ #fff / #000
+      backgroundColor: colors.background,
     },
 
     // --- Üst bar ---
@@ -221,7 +237,7 @@ const createStyles = (colors) =>
       width: 40,
       height: 40,
       borderRadius: 20,
-      backgroundColor: colors.surface,         // ✅ #f2f2f7 / #1c1c1e
+      backgroundColor: colors.surface,
       justifyContent: "center",
       alignItems: "center",
       elevation: 2,
@@ -240,7 +256,7 @@ const createStyles = (colors) =>
     },
     primaryCaptureButton: {
       flexDirection: "row",
-      backgroundColor: colors.accentOrangeLight, // ✅ #FEF3E2 / #3d2400
+      backgroundColor: colors.accentOrangeLight,
       paddingVertical: 14,
       paddingHorizontal: 24,
       borderRadius: 25,
@@ -252,7 +268,7 @@ const createStyles = (colors) =>
       shadowRadius: 3,
     },
     primaryCaptureText: {
-      color: colors.accentOrange,               // ✅ turuncu — her iki temada uyumlu
+      color: colors.accentOrange,
       fontSize: 16,
       fontWeight: "bold",
     },
@@ -264,7 +280,7 @@ const createStyles = (colors) =>
       height: 140,
       borderRadius: 70,
       borderWidth: 3,
-      borderColor: colors.accentOrange,         // ✅ #FF9500
+      borderColor: colors.accentOrange,
       overflow: "hidden",
       marginBottom: 12,
     },
@@ -278,7 +294,7 @@ const createStyles = (colors) =>
       paddingHorizontal: 16,
       borderRadius: 15,
       borderWidth: 1,
-      borderColor: colors.accentOrange,         // ✅ #FF9500
+      borderColor: colors.accentOrange,
       alignItems: "center",
       backgroundColor: colors.accentOrangeLight,
     },
@@ -294,17 +310,17 @@ const createStyles = (colors) =>
       paddingTop: 5,
       paddingBottom: 25,
       borderBottomWidth: 1,
-      borderBottomColor: colors.separator,      // ✅ #EAEAEA / #3a3a3c
+      borderBottomColor: colors.separator,
       alignItems: "center",
     },
     userName: {
       fontSize: 26,
       fontWeight: "bold",
-      color: colors.textPrimary,                // ✅ #000 / #fff
+      color: colors.textPrimary,
     },
     userEmail: {
       fontSize: 15,
-      color: colors.textMuted,                  // ✅ #999 / #8E8E93
+      color: colors.textMuted,
       marginTop: 4,
     },
 
@@ -313,11 +329,11 @@ const createStyles = (colors) =>
       paddingVertical: 10,
       marginHorizontal: 20,
       marginTop: 15,
-      backgroundColor: colors.surface,          // ✅ #f2f2f7 / #1c1c1e
+      backgroundColor: colors.surface,
       borderRadius: 16,
       overflow: "hidden",
       borderWidth: 1,
-      borderColor: colors.surfaceBorder,        // ✅ #EAEAEA / #3a3a3c
+      borderColor: colors.surfaceBorder,
     },
     menuItem: {
       flexDirection: "row",
@@ -326,11 +342,11 @@ const createStyles = (colors) =>
       paddingVertical: 16,
       paddingHorizontal: 20,
       borderBottomWidth: 1,
-      borderBottomColor: colors.separator,      // ✅ #EAEAEA / #3a3a3c
+      borderBottomColor: colors.separator,
     },
     menuText: {
       fontSize: 16,
-      color: colors.textPrimary,                // ✅ #000 / #fff
+      color: colors.textPrimary,
       fontWeight: "500",
     },
 
@@ -343,14 +359,14 @@ const createStyles = (colors) =>
       flexDirection: "row",
       justifyContent: "center",
       alignItems: "center",
-      backgroundColor: colors.surface,          // ✅ #f2f2f7 / #1c1c1e
+      backgroundColor: colors.surface,
       padding: 16,
       borderRadius: 16,
       borderWidth: 1,
       borderColor: colors.surfaceBorder,
     },
     logoutText: {
-      color: colors.dangerRed,                  // ✅ #e74c3c / #ff453a
+      color: colors.dangerRed,
       fontSize: 16,
       fontWeight: "600",
     },
@@ -359,15 +375,15 @@ const createStyles = (colors) =>
       justifyContent: "center",
       alignItems: "center",
       backgroundColor: colors.isDark
-        ? "rgba(255,69,58,0.12)"                // koyu kırmızı şeffaf — dark
-        : "rgba(231,76,60,0.08)",               // açık kırmızı şeffaf — light
+        ? "rgba(255,69,58,0.12)"
+        : "rgba(231,76,60,0.08)",
       padding: 16,
       borderRadius: 16,
       borderWidth: 1,
-      borderColor: colors.dangerRed + "40",     // %25 opaklık
+      borderColor: colors.dangerRed + "40",
     },
     deleteText: {
-      color: colors.dangerRed,                  // ✅ #e74c3c / #ff453a
+      color: colors.dangerRed,
       fontSize: 16,
       fontWeight: "600",
     },

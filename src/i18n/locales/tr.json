@@ -104,5 +104,20 @@
     "lines": "Hatlar",
     "profile": "Profil",
     "settings": "Ayarlar"
+  },
+  "camera": {
+    "loading": "Kamera yükleniyor...",
+    "permissionRequired": "Kamera İzni Gerekli",
+    "permissionMessage": "Profil fotoğrafı çekmek için kamera izni vermelisiniz.",
+    "grantPermission": "İzin Ver",
+    "retake": "Tekrar Çek",
+    "save": "Kaydet",
+    "success": "Başarılı!",
+    "uploadSuccess": "Profil fotoğrafınız kaydedildi.",
+    "error": "Hata",
+    "uploadError": "Fotoğraf kaydedilirken bir sorun oluştu.",
+    "userNotFound": "Oturum açmış bir kullanıcı bulunamadı.",
+    "ok": "Tamam"
   }
 }
+

@@ -1,4 +1,4 @@
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import useTheme from "../hooks/useTheme";
@@ -12,6 +12,8 @@ import {
   TouchableOpacity,
   Animated,
   Dimensions,
+  Image,
+  Alert,
 } from "react-native";
 import ModalSelect from "../components/modalS";
 import Button from "../components/button";
@@ -19,13 +21,18 @@ import { LinearGradient } from "expo-linear-gradient";
 import LocationButton from "../components/locationButton";
 import { BlurView } from "expo-blur";
 import BusTime from "../components/busTime";
-import { useRoute } from "@react-navigation/native";
+import { useRoute, useFocusEffect } from "@react-navigation/native";
+import { doc, getDoc } from "firebase/firestore";
+import { db, auth } from "../firebase/firebase";
+import { signOut } from "firebase/auth";
+import { Ionicons } from "@expo/vector-icons";
 
 const { width } = Dimensions.get("window");
 const DRAWER_WIDTH = width * 0.75;
 
 export default function HomeScreen({ navigation }) {
   const [selectedValue, setSelectedValue] = useState(null);
+  const [firebasePhoto, setFirebasePhoto] = useState(null);
   const [showBus, setShowBus] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
@@ -33,8 +40,29 @@ export default function HomeScreen({ navigation }) {
   const { t } = useTranslation();
   const route = useRoute();
   const user = useSelector((state) => state.auth.user);
-  const { colors, isDark } = useTheme();  // ✅ isDark de alınıyor
+  const { colors, isDark } = useTheme();
   const styles = createStyles(colors);
+
+  useFocusEffect(
+    useCallback(() => {
+      const loadPhotoFromFirestore = async () => {
+        try {
+          const docRef = doc(db, "users", user.uid, "photos", "profile");
+          const docSnap = await getDoc(docRef);
+
+          if (docSnap.exists()) {
+            setFirebasePhoto(docSnap.data().uri);
+          }
+        } catch (error) {
+          console.log("Drawer fotoğraf yükleme hatası:", error);
+        }
+      };
+
+      if (user?.uid) {
+        loadPhotoFromFirestore();
+      }
+    }, [user?.uid])
+  );
 
   const toggleDrawer = () => {
     if (isDrawerOpen) {
@@ -61,18 +89,38 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
+  const handleLogout = () => {
+    Alert.alert(
+      t("home.logout"),
+      t("home.logoutConfirm"),
+      [
+        { text: t("home.cancel"), style: "cancel" },
+        {
+          text: t("home.logout"),
+          style: "destructive",
+          onPress: async () => {
+            try {
+              await signOut(auth);
+            } catch (error) {
+              console.log(t("home.logoutError"), error);
+            }
+          },
+        },
+      ]
+    );
+  };
+
   const options = [
-    { label: t("home.stops.semaDogan"),     value: "Sema Doğan" },
-    { label: t("home.stops.hospital"),      value: "Hastane" },
-    { label: t("home.stops.university"),    value: "Üniversite" },
-    { label: t("home.stops.market"),        value: "Çarşı" },
-    { label: t("home.stops.busStation"),    value: "Otogar" },
-    { label: t("home.stops.zeynepAna"),     value: "Zeynep Ana" },
-    { label: t("home.stops.tepeYurt"),      value: "Tepe Yurt" },
+    { label: t("home.stops.semaDogan"), value: "Sema Doğan" },
+    { label: t("home.stops.hospital"), value: "Hastane" },
+    { label: t("home.stops.university"), value: "Üniversite" },
+    { label: t("home.stops.market"), value: "Çarşı" },
+    { label: t("home.stops.busStation"), value: "Otogar" },
+    { label: t("home.stops.zeynepAna"), value: "Zeynep Ana" },
+    { label: t("home.stops.tepeYurt"), value: "Tepe Yurt" },
     { label: t("home.stops.teachersHouse"), value: "Öğretmen Evi" },
   ];
 
-  
   const gradientColors = isDark
     ? ["rgba(0,0,0,1)", "rgba(0,0,0,0.2)"]
     : ["rgba(0,0,0,0.4)", "transparent"];
@@ -148,14 +196,89 @@ export default function HomeScreen({ navigation }) {
           <Text style={styles.drawerTitle}>{t("home.menu")}</Text>
         </View>
 
+        {/* Profil fotoğrafı - tıklanabilir */}
+        <View style={styles.drawerPhotoContainer}>
+          <TouchableOpacity
+            onPress={() => {
+              toggleDrawer();
+              navigation.navigate("CameraScreen");
+            }}
+            style={styles.drawerImageWrapper}
+          >
+            {firebasePhoto ? (
+              <Image
+                source={{ uri: firebasePhoto }}
+                style={styles.drawerImage}
+              />
+            ) : (
+              <View style={styles.placeholderAvatar}>
+                <Ionicons
+                  name="person"
+                  size={40}
+                  color={colors.textSecondary}
+                />
+              </View>
+            )}
+            <View style={styles.cameraIconOverlay}>
+              <Ionicons name="camera" size={16} color={colors.white} />
+            </View>
+          </TouchableOpacity>
+          <Text style={styles.drawerUserName}>
+            {user?.displayName || t("home.passenger")}
+          </Text>
+        </View>
+
+        {/* Profil */}
         <TouchableOpacity
           style={styles.drawerItem}
           onPress={() => {
             toggleDrawer();
-            navigation.getParent()?.navigate("Profile");
+            navigation.navigate("Profile");
           }}
         >
-          <Text style={styles.drawerItemText}>👤 {t("home.profile")}</Text>
+          <Ionicons
+            name="person-outline"
+            size={20}
+            color={colors.textPrimary}
+            style={{ marginRight: 10 }}
+          />
+          <Text style={styles.drawerItemText}>{t("home.profile")}</Text>
+        </TouchableOpacity>
+
+        {/* Ayarlar */}
+        <TouchableOpacity
+          style={styles.drawerItem}
+          onPress={() => {
+            toggleDrawer();
+            navigation.getParent()?.navigate("Ayarlar");
+          }}
+        >
+          <Ionicons
+            name="settings-outline"
+            size={20}
+            color={colors.textPrimary}
+            style={{ marginRight: 10 }}
+          />
+          <Text style={styles.drawerItemText}>{t("home.settings")}</Text>
+        </TouchableOpacity>
+
+        {/* Çıkış Yap */}
+        <TouchableOpacity
+          style={styles.drawerItem}
+          onPress={() => {
+            toggleDrawer();
+            handleLogout();
+          }}
+        >
+          <Ionicons
+            name="log-out-outline"
+            size={20}
+            color={colors.dangerRed}
+            style={{ marginRight: 10 }}
+          />
+          <Text style={[styles.drawerItemText, { color: colors.dangerRed }]}>
+            {t("home.logout")}
+          </Text>
         </TouchableOpacity>
       </Animated.View>
     </View>
@@ -208,7 +331,6 @@ const createStyles = (colors) =>
       backgroundColor: "rgba(0,0,0,0.5)",
       zIndex: 100,
     },
-    // ✅ Drawer artık colors kullanıyor
     drawer: {
       position: "absolute",
       top: 0,
@@ -233,11 +355,58 @@ const createStyles = (colors) =>
       fontWeight: "bold",
       color: colors.accentOrange,
     },
+    drawerPhotoContainer: {
+      alignItems: "center",
+      marginBottom: 25,
+      paddingBottom: 15,
+      borderBottomWidth: 1,
+      borderBottomColor: colors.surfaceBorder,
+    },
+    drawerImageWrapper: {
+      width: 100,
+      height: 100,
+      borderRadius: 50,
+      overflow: "hidden",
+      marginBottom: 10,
+      borderWidth: 2,
+      borderColor: colors.accentOrange,
+      position: "relative",
+    },
+    drawerImage: {
+      width: "100%",
+      height: "100%",
+    },
+    cameraIconOverlay: {
+      position: "absolute",
+      bottom: 0,
+      right: 0,
+      backgroundColor: colors.accentOrange,
+      width: 28,
+      height: 28,
+      borderRadius: 14,
+      justifyContent: "center",
+      alignItems: "center",
+      borderWidth: 2,
+      borderColor: colors.surface,
+    },
+    placeholderAvatar: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: colors.inputBg,
+    },
+    drawerUserName: {
+      color: colors.textPrimary,
+      fontSize: 16,
+      fontWeight: "600",
+    },
     drawerItem: {
       backgroundColor: colors.inputBg,
       padding: 15,
       borderRadius: 10,
       marginBottom: 10,
+      flexDirection: "row",
+      alignItems: "center",
     },
     drawerItemText: {
       color: colors.textPrimary,

@@ -8,7 +8,7 @@ import ProfileScreen from "../screens/profileScreen.js";
 import SettingsScreen from "../screens/settingsScreen.js";
 import ChangePasswordScreen from "../screens/ChangePasswordScreen.js";
 import MapScreen from "../screens/MapScreen.js";
-import CameraScreen from "../screens/CameraScreen.js"; // 1. EKLENDİ: Kamera ekranını import ettik
+import CameraScreen from "../screens/CameraScreen.js";
 import { AppColors } from "../styles/colors.js";
 import { useTranslation } from "react-i18next";
 
@@ -39,9 +39,6 @@ function HomeStack({ route }) {
         initialParams={{ name }}
       />
       <Stack.Screen name="MapScreen" component={MapScreen} />
-      
-      {/* 2. EKLENDİ: Kamera Ekranını buraya gizli bir rota olarak tanımladık */}
-      {/* Kullanıcının geri dönebilmesi için bu ekranda üst başlığı (Header) görünür yaptık */}
       <Stack.Screen 
         name="CameraScreen" 
         component={CameraScreen} 
@@ -53,13 +50,24 @@ function HomeStack({ route }) {
           headerTransparent: false
         }}
       />
+      {/* ✅ Profile ve Ayarlar ekranlarını HomeStack'e ekleyin */}
+      <Stack.Screen 
+        name="Profile" 
+        component={ProfileScreen}
+        options={{ headerShown: false }}
+      />
+      <Stack.Screen 
+        name="Ayarlar" 
+        component={SettingsScreen}
+        options={{ headerShown: false }}
+      />
     </Stack.Navigator>
   );
 }
 
 export default function TabNavigator({ user, setUserData }) {
-
   const { t } = useTranslation();
+  
   return (
     <Tab.Navigator
       screenOptions={{

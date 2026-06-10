@@ -33,10 +33,12 @@
     "selectStop": "Select Your Stop",
     "select": "Select",
     "noStop": "Please select a stop.",
-    "selectFromLocation": "Select from Map",
+    "selectFromLocation": "Select From Map",
     "selectStopPlaceholder": "Select Your Current Stop",
     "profile": "Profile",
     "menu": "Menu",
+    "logout": "Logout",
+    "settings":"Settings",
     "home": "Home",
     "stops": {
       "semaDogan": "Sema Doğan",
@@ -103,6 +105,22 @@
     "home": "Home",
     "stops": "Stops",
     "lines": "Lines",
-    "profile": "Profile"
-   }
+    "profile": "Profile",
+    "settings": "Settings"
+   },
+  "camera": {
+    "loading": "Loading camera...",
+    "permissionRequired": "Camera Permission Required",
+    "permissionMessage": "You must grant camera permission to take a profile photo.",
+    "grantPermission": "Grant Permission",
+    "retake": "Retake",
+    "save": "Save",
+    "success": "Success!",
+    "uploadSuccess": "Your profile photo has been saved.",
+    "error": "Error",
+    "uploadError": "There was a problem saving the photo.",
+    "userNotFound": "No signed-in user found.",
+    "ok": "OK"
+  }
 }
+   
