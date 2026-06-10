@@ -7,6 +7,7 @@ import { AppColors } from "../styles/colors";
 import { useTranslation } from "react-i18next";
 import useTheme from "../hooks/useTheme";
 import { loginUser, getUser } from "../api/firestore_api";
+import { Platform } from "react-native";
 import {
   View,
   Text,
@@ -56,7 +57,7 @@ export default function LoginScreen({ setIsRegistering }) {
   };
 
   return (
-    <KeyboardAvoidingView style={styles.container} behavior="padding">
+    <KeyboardAvoidingView style={styles.container} behavior={Platform.OS === "ios" ? "padding" : "height"}>
       <Image
         source={require("../../assets/belediye_logo2.png")}
         style={styles.logo}
@@ -148,7 +149,7 @@ const createStyles = (colors) =>
       elevation: 5,
     },
     buttonText: {
-      color: "#ffffff",               
+      color: AppColors.white,               
       fontWeight: "bold",
       fontSize: 15,
     },

@@ -56,6 +56,7 @@ export default function ProfileScreen() {
 
   const handleOpenCamera = async () => {
     const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
+    navigation.navigate("CameraScreen");  // ✅ CameraScreen'e yönlendir
     if (permissionResult.granted === false) {
       Alert.alert(
         t("profile.cameraPermRequired"),

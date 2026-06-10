@@ -3,6 +3,7 @@ import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import useTheme from "../hooks/useTheme";
 import DrawerButton from "../components/drawerButton";
+import {AppColors} from "../styles/colors";
 
 import {
   Text,

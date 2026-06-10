@@ -25,5 +25,6 @@ export const AppColors = {
   brown: "#524a4a",
   brown2: "#504e4e",
   gray1_0: "#35393d",
-  pre_dark: "rgba(255, 255, 255, 0.7)",
+  pre_dark: "rgba(162, 168, 132, 0.7)",
+  gaybuton: "#e4e8a0",
 };

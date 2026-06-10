@@ -19,6 +19,7 @@ import { db } from "../firebase/firebase";
 import { Ionicons } from "@expo/vector-icons";
 import useTheme from "../hooks/useTheme";
 import Button from "../components/button";
+import AppColors from "../styles/colors";
 
 export default function CameraScreen() {
   const navigation = useNavigation();
@@ -157,11 +158,11 @@ export default function CameraScreen() {
               color={colors.textMuted}
             />
             <Text style={styles.infoText}>
-              {t("camera.noPhoto")}
+              {t("Henüz bir fotoğrafınız yok. Profil fotoğrafınızı ekleyerek hesabınızı kişiselleştirin")}
             </Text>
             <Button
               label={t("camera.takePhoto")}
-              theme="primary"
+              theme="secondary"
               onPress={openCameraAndCrop}
             />
           </View>
@@ -251,6 +252,9 @@ const createStyles = (colors) =>
     emptyState: {
       alignItems: "center",
       width: "100%",
+      borderRadius: 45,
+      padding: 60,
+      backgroundColor: colors.surface,
     },
     infoText: {
       color: colors.textMuted,
