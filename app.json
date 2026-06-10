@@ -1,0 +1,50 @@
+{
+  "expo": {
+    "name": "navigation-and-bottom-tabs",
+    "slug": "navigation-and-bottom-tabs",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "splash": {
+      "image": "./assets/splash-icon.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
+    "ios": {
+      "supportsTablet": true
+    },
+    "android": {
+      "adaptiveIcon": {
+        "backgroundColor": "#E6F4FE",
+        "foregroundImage": "./assets/android-icon-foreground.png",
+        "backgroundImage": "./assets/android-icon-background.png",
+        "monochromeImage": "./assets/android-icon-monochrome.png"
+      },
+      "package": "com.messi10kaya.navigationandbottomtabs",
+      "config": {
+        "googleMaps": {
+          "apiKey": "AIzaSyBwL5mX1K6uciDTqCQYLfxIEf862lKeHm4"
+        }
+      }
+    },
+    "web": {
+      "favicon": "./assets/favicon.png"
+    },
+    "plugins": [
+      "expo-secure-store",
+      [
+        "react-native-maps",
+        {
+          "googleMapsApiKey": "AIzaSyBwL5mX1K6uciDTqCQYLfxIEf862lKeHm4"
+        }
+      ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "6f526032-847d-42d6-ade8-c8418ff594c0"
+      }
+    },
+    "owner": "messi10kaya"
+  }
+}

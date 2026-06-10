@@ -1,0 +1,131 @@
+import { useState } from "react";
+import { useDispatch } from "react-redux";
+import { logout } from "../redux/authSlice";
+import { signOut } from "firebase/auth";
+import { auth } from "../firebase/firebase";
+import { useSelector } from "react-redux";
+import {
+  Text,
+  View,
+  StyleSheet,
+  ImageBackground,
+  ScrollView,
+  TouchableOpacity,
+} from "react-native";
+import ModalSelect from "../components/modalS";
+import Button from "../components/button";
+import { LinearGradient } from "expo-linear-gradient";
+import LocationButton from "../components/locationButton";
+import { BlurView } from "expo-blur";
+import BusTime from "../components/busTime";
+import { useRoute } from "@react-navigation/native";
+import { AppColors } from "../styles/colors";
+export default function HomeScreen({ navigation }) {
+  const [selectedValue, setSelectedValue] = useState(null);
+  const [showBus, setShowBus] = useState(false);
+  const dispatch = useDispatch();
+
+  const secButton = () => {
+    if (selectedValue == null) alert("Lütfen bir durak seçiniz.");
+    else {
+      setShowBus(true);
+
+      setSelectedValue(null);
+    }
+  };
+
+  const route = useRoute();
+  const user = useSelector((state) => state.auth.user);
+  const options = [
+    { label: "Sema Doğan", value: "Sema Doğan" },
+    { label: "Hastane", value: "Hastane" },
+    { label: "Üniversite", value: "Üniversite" },
+    { label: "Çarşı", value: "Çarşı" },
+    { label: "Otogar", value: "Otogar" },
+    { label: "Zeynep Ana", value: "Zeynep Ana" },
+    { label: "Tepe Yurt", value: "Tepe Yurt" },
+    { label: "Öğretmen Evi", value: "Öğretmen Evi" },
+  ];
+  return (
+    <ImageBackground
+      source={require("../../assets/guDag.jpeg")}
+      style={styles.container}
+    >
+      <LinearGradient
+        colors={[AppColors.black0_6, "transparent"]}
+        style={StyleSheet.absoluteFill}
+      />
+
+      <BlurView intensity={10} borderRadius={30} style={styles.header}>
+        <Text style={styles.headerText}>
+          Hoşgeldiniz {user?.displayName || "Yolcu"}
+        </Text>
+      </BlurView>
+
+      <View style={styles.content}>
+        <View style={styles.modalContainer}>
+          <ModalSelect
+            options={options}
+            value={selectedValue}
+            onSelect={(value) => setSelectedValue(value)}
+          />
+        </View>
+
+        <View style={styles.buttonviewContainer}>
+          <Button label="Seç" theme="primary" onPress={secButton} />
+        </View>
+        {showBus && <BusTime />}
+      </View>
+      <View style={styles.buttonviewContainer}>
+        <LocationButton
+          label="Konumdan Seç"
+          theme="primary"
+          onPress={() => navigation.navigate("MapScreen")}
+        />
+      </View>
+    </ImageBackground>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    justifyContent: "center",
+    flex: 1,
+    alignItems: "center",
+  },
+  text: {
+    fontSize: 20,
+    color: AppColors.black,
+    position: "absolute",
+    top: 30,
+    left: 20,
+    fontFamily: "Roboto",
+  },
+  modalContainer: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  buttonviewContainer: {
+    alignItems: "center",
+    marginBottom: 20,
+  },
+  header: {
+    position: "absolute",
+    top: 130,
+    left: 20,
+    right: 20,
+    backgroundColor: AppColors.black0_3,
+    padding: 10,
+    borderRadius: 10,
+  },
+
+  headerText: {
+    color: AppColors.light_orange,
+    fontSize: 28,
+  },
+  content: {
+    marginTop: 10,
+    width: "100%",
+    alignItems: "center",
+  },
+});
