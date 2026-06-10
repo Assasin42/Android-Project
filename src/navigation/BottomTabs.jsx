@@ -1,6 +1,6 @@
 import React from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import { createStackNavigator } from "@react-navigation/stack";
 import { Ionicons } from "@expo/vector-icons";
 import { BlurView } from "expo-blur";
 import HomeScreen from "../screens/HomeScreen.js";
@@ -11,7 +11,7 @@ import MapScreen from "../screens/MapScreen.js";
 import { AppColors } from "../styles/colors.js";
 
 const Tab = createBottomTabNavigator();
-const Stack = createNativeStackNavigator();
+const Stack = createStackNavigator();
 
 function SettingsStack({ route }) {
   const { user, setUserData } = route.params || {};
@@ -29,7 +29,9 @@ function SettingsStack({ route }) {
 function HomeStack({ route }) {
   const { name } = route.params || {};
   return (
-    <Stack.Navigator screenOptions={{ headerShown: false }}>
+    <Stack.Navigator
+      screenOptions={{ headerShown: false, detachInactiveScreens: false }}
+    >
       <Stack.Screen
         name="HomeMain"
         component={HomeScreen}

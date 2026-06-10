@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { logout } from "../redux/authSlice";
 import { signOut } from "firebase/auth";
@@ -22,10 +22,16 @@ import BusTime from "../components/busTime";
 import { useRoute } from "@react-navigation/native";
 import { AppColors } from "../styles/colors";
 import * as Location from "expo-location";
+import { busLocations } from "../data/busLocations";
 export default function HomeScreen({ navigation }) {
   const [selectedValue, setSelectedValue] = useState(null);
   const [showBus, setShowBus] = useState(false);
-  const dispatch = useDispatch();
+  const route = useRoute();
+  useEffect(() => {
+    if (route.params?.nearestStop) {
+      setSelectedValue(route.params?.nearestStop);
+    }
+  }, [route.params?.nearestStop]);
 
   const openMap = async () => {
     const { status } = await Location.requestForegroundPermissionsAsync();
@@ -33,11 +39,28 @@ export default function HomeScreen({ navigation }) {
       alert("Konum İzni Gerekli");
       return;
     }
-    const location = await Location.getCurrentPositionAsync({});
-    navigation.navigate("MapScreen", {
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
-    });
+    try {
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
+      navigation.navigate("MapScreen", {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+    } catch {
+      const location = await Location.getLastKnownPositionAsync({});
+      if (location) {
+        navigation.navigate("MapScreen", {
+          latitude: location.coords.latitude,
+          longitude: location.coords.longitude,
+        });
+      } else {
+        navigation.navigate("MapScreen", {
+          latitude: 40.4378,
+          longitude: 39.5172,
+        });
+      }
+    }
   };
   const secButton = () => {
     if (selectedValue == null) alert("Lütfen bir durak seçiniz.");
@@ -47,19 +70,11 @@ export default function HomeScreen({ navigation }) {
       setSelectedValue(null);
     }
   };
-
-  const route = useRoute();
+  const options = busLocations.map((location) => ({
+    label: location.title,
+    value: location.title,
+  }));
   const user = useSelector((state) => state.auth.user);
-  const options = [
-    { label: "Sema Doğan", value: "Sema Doğan" },
-    { label: "Hastane", value: "Hastane" },
-    { label: "Üniversite", value: "Üniversite" },
-    { label: "Çarşı", value: "Çarşı" },
-    { label: "Otogar", value: "Otogar" },
-    { label: "Zeynep Ana", value: "Zeynep Ana" },
-    { label: "Tepe Yurt", value: "Tepe Yurt" },
-    { label: "Öğretmen Evi", value: "Öğretmen Evi" },
-  ];
   return (
     <ImageBackground
       source={require("../../assets/guDag.jpeg")}
