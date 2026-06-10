@@ -34,7 +34,8 @@
           "googleMapsApiKey": "AIzaSyCBeGZv26TEdlRWevS_-oJRL9rRJNaPFDg"
         }
       ],
-      "expo-sqlite"
+      "expo-sqlite",
+      "expo-localization"
     ],
     "extra": {
       "eas": {

@@ -5,6 +5,13 @@ import { useDispatch } from "react-redux";
 import { loginSuccess } from "../redux/authSlice";
 import { AppColors } from "../styles/colors";
 
+import { useTranslation } from "react-i18next";
+          
+  
+
+// DİKKAT: loginUser ve getUser birlikte import edildi
+import { loginUser, getUser } from "../api/firestore_api";
+
 import {
   View,
   Text,
@@ -17,6 +24,7 @@ import {
 } from "react-native";
 
 export default function LoginScreen({ setIsRegistering }) {
+  const { t } = useTranslation();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
@@ -24,7 +32,7 @@ export default function LoginScreen({ setIsRegistering }) {
 
   const handleLogin = async () => {
     if (!email || !password) {
-      alert("Email ve şifre zorunlu");
+      alert(t('login.emailRequired'));
       return;
     }
 
@@ -47,7 +55,7 @@ export default function LoginScreen({ setIsRegistering }) {
       );
     } catch (error) {
       console.log(error);
-      alert("Email veya şifre yanlış");
+      alert(t('login.wrongCredentials'));
     } finally {
       setLoading(false);
     }

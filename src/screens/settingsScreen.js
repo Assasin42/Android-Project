@@ -1,3 +1,4 @@
+import { openLanguageSheet } from "../components/LanguageSheet"; // ✅ import edildi
 import { Ionicons } from "@expo/vector-icons";
 import React from "react";
 import {
@@ -9,53 +10,71 @@ import {
   View,
 } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { moderateScale, scale, verticalScale } from "react-native-size-matters";
+import { scale, verticalScale } from "react-native-size-matters";
 import { useNavigation, useRoute } from "@react-navigation/native";
+import { useTranslation } from "react-i18next"; // ✅ eklendi
 import { AppColors } from "../styles/colors.js";
-const { width, height } = Dimensions.get("window");
 
-const settingsOptions = [
-  {
-    id: "1",
-    name: "Bildirim Ayarları",
-    icon: "notifications-outline",
-    color: AppColors.orange,
-    bgColor: AppColors.whiteEa,
-  },
-  {
-    id: "2",
-    name: "Şifre Değiştir",
-    icon: "shield-checkmark-outline",
-    color: AppColors.green,
-    bgColor: AppColors.whiteEa,
-  },
-  {
-    id: "3",
-    name: "Dil Seçenekleri",
-    icon: "globe-outline",
-    color: AppColors.purple,
-    bgColor: AppColors.whiteEa,
-  },
-  {
-    id: "4",
-    name: "Karanlık Mod",
-    icon: "moon-outline",
-    color: AppColors.gray1_0,
-    bgColor: AppColors.whiteEa,
-  },
-  {
-    id: "5",
-    name: "Yardım ve Destek",
-    icon: "help-circle-outline",
-    color: AppColors.pink,
-    bgColor: AppColors.whiteEa,
-  },
-];
+const { width } = Dimensions.get("window");
 
 export default function SettingsScreen() {
   const navigation = useNavigation();
   const route = useRoute();
   const { user } = route.params || {};
+  const { t } = useTranslation(); // ✅ eklendi
+
+  
+  const settingsOptions = [
+    {
+      id: "notifications",
+      name: t("settings.notifications"),
+      icon: "notifications-outline",
+      color: AppColors.orange,
+      bgColor: AppColors.whiteEa,
+    },
+    {
+      id: "changePassword",
+      name: t("settings.changePassword"),
+      icon: "shield-checkmark-outline",
+      color: AppColors.green,
+      bgColor: AppColors.whiteEa,
+    },
+    {
+      id: "language",
+      name: t("settings.language"),
+      icon: "globe-outline",
+      color: AppColors.purple,
+      bgColor: AppColors.whiteEa,
+    },
+    {
+      id: "darkMode",
+      name: t("settings.darkMode"),
+      icon: "moon-outline",
+      color: AppColors.gray1_0,
+      bgColor: AppColors.whiteEa,
+    },
+    {
+      id: "helpSupport",
+      name: t("settings.helpSupport"),
+      icon: "help-circle-outline",
+      color: AppColors.pink,
+      bgColor: AppColors.whiteEa,
+    },
+  ];
+
+
+  const handlePress = (itemId) => {
+    switch (itemId) {
+      case "changePassword":
+        navigation.navigate("ChangePassword");
+        break;
+      case "language":
+        openLanguageSheet(); 
+        break;
+      default:
+        console.log(`${itemId} tıklandı`);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -69,7 +88,8 @@ export default function SettingsScreen() {
       </View>
 
       <View style={styles.content}>
-        <Text style={styles.sectionTitle}>Hesap ve Uygulama</Text>
+        {/* ✅ Hardcoded Türkçe yerine t() kullanılıyor */}
+        <Text style={styles.sectionTitle}>{t("settings.sectionTitle")}</Text>
 
         <View style={styles.card}>
           {settingsOptions.map((item, index) => (
@@ -77,13 +97,7 @@ export default function SettingsScreen() {
               <TouchableOpacity
                 style={styles.listItem}
                 activeOpacity={0.7}
-                onPress={() => {
-                  if (item.name === "Şifre Değiştir") {
-                    navigation.navigate("ChangePassword");
-                  } else {
-                    console.log(`${item.name} tıklandı`);
-                  }
-                }}
+                onPress={() => handlePress(item.id)} 
               >
                 <View style={styles.itemLeft}>
                   <View
@@ -94,9 +108,7 @@ export default function SettingsScreen() {
                   >
                     <Ionicons name={item.icon} size={22} color={item.color} />
                   </View>
-                  <Text
-                    style={[styles.itemText, { color: AppColors.black333 }]}
-                  >
+                  <Text style={[styles.itemText, { color: AppColors.black333 }]}>
                     {item.name}
                   </Text>
                 </View>

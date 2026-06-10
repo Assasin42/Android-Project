@@ -8,6 +8,9 @@ import { View, ActivityIndicator } from "react-native";
 import LoginScreen from "./src/screens/LoginScreen";
 import RegisterScreen from "./src/screens/RegisterScreen";
 import TabNavigator from "./src/navigation/BottomTabs";
+import "./src/i18n/i18nConfig"; 
+import { SheetProvider } from "react-native-actions-sheet";
+import "./src/components/LanguageSheet";
 
 function AppNavigator() {
   const [isRegistering, setIsRegistering] = useState(false);
@@ -30,6 +33,7 @@ function AppNavigator() {
 export default function App() {
   return (
     <Provider store={store}>
+      <SheetProvider>
       <PersistGate
         loading={
           <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -40,6 +44,7 @@ export default function App() {
       >
         <AppNavigator />
       </PersistGate>
+      </SheetProvider>
     </Provider>
   );
 }

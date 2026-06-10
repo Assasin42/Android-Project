@@ -7,6 +7,7 @@ import { db } from "../firebase/firebase"; // Firestore referansı
 import { loginSuccess } from "../redux/authSlice";
 import { updateProfile } from "firebase/auth"; // updateProfile ekle
 import { AppColors } from "../styles/colors";
+import { useTranslation } from "react-i18next";
 import {
   View,
   Text,
@@ -27,10 +28,10 @@ export default function RegisterScreen({ setIsRegistering }) {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
-
+  const { t } = useTranslation();
   const handleRegister = async () => {
     if (!email || !password) {
-      alert("Email ve şifre zorunlu");
+      alert(t('register.emailRequired'));
       return;
     }
 
@@ -41,6 +42,7 @@ export default function RegisterScreen({ setIsRegistering }) {
         email,
         password,
       );
+      alert(t('register.registerSuccess'));
       const user = userCredential.user;
 
       await updateProfile(user, {
@@ -54,12 +56,12 @@ export default function RegisterScreen({ setIsRegistering }) {
         email: email,
         createdAt: new Date().toISOString(),
       });
-      // ✅ Login ekranına at, otomatik giriş yapma
+      
       setIsRegistering(false);
     } catch (error) {
       console.log("HATA KODU:", error.code);
       console.log("HATA MESAJI:", error.message);
-      alert("Kayıt başarısız: " + error.message);
+      alert(t('register.failed'));
     } finally {
       setLoading(false);
     }

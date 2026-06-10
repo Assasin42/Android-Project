@@ -17,56 +17,53 @@ import {
   reauthenticateWithCredential,
   updatePassword,
 } from "firebase/auth";
-import { signOut } from "firebase/auth";
-import { useDispatch } from "react-redux";
-import { logout } from "../redux/authSlice";
+import { useTranslation } from "react-i18next";
 import { AppColors } from "../styles/colors";
+
 export default function ChangePasswordScreen() {
   const navigation = useNavigation();
+  const { t } = useTranslation();
   const [loading, setLoading] = useState(false);
   const [current, setCurrent] = useState("");
   const [newPass, setNewPass] = useState("");
   const [confirm, setConfirm] = useState("");
-  const dispatch = useDispatch();
+
   const handleChangePassword = async () => {
     if (!current || !newPass || !confirm) {
-      alert("Lütfen tüm alanları doldurun.");
+      alert(t("changePassword.fillAll"));
       return;
     }
     if (newPass !== confirm) {
-      alert("Yeni şifreler eşleşmiyor.");
-      return;
-    }
-    if (newPass.length < 6) {
-      alert("Yeni şifre en az 6 karakter olmalı.");
+      alert(t("changePassword.notMatch"));
       return;
     }
 
     setLoading(true);
     try {
-      const user = auth.currentUser;
+      const firebaseUser = auth.currentUser;
 
-      // Önce mevcut şifreyle kimlik doğrula
-      const credential = EmailAuthProvider.credential(user.email, current);
-      await reauthenticateWithCredential(user, credential);
+      // ✅ Mevcut şifreyi Firebase ile doğrula (client-side karşılaştırma GÜVENSİZdir)
+      const credential = EmailAuthProvider.credential(
+        firebaseUser.email,
+        current
+      );
+      await reauthenticateWithCredential(firebaseUser, credential);
 
-      // Sonra şifreyi güncelle
-      await updatePassword(user, newPass);
+      // ✅ Firebase Auth üzerinden şifreyi güncelle
+      await updatePassword(firebaseUser, newPass);
 
-      alert("Şifre başarıyla güncellendi!");
-
-      await signOut(auth);
-      dispatch(logout());
+      alert(t("changePassword.success"));
       navigation.goBack();
     } catch (error) {
       console.log(error);
+      // Yanlış mevcut şifre hatası
       if (
         error.code === "auth/wrong-password" ||
         error.code === "auth/invalid-credential"
       ) {
-        alert("Mevcut şifre yanlış.");
+        alert(t("changePassword.wrongCurrent"));
       } else {
-        alert("Şifre güncellenirken hata oluştu: " + error.message);
+        alert(t("changePassword.error"));
       }
     } finally {
       setLoading(false);
@@ -85,36 +82,41 @@ export default function ChangePasswordScreen() {
         >
           <Ionicons name="chevron-back" size={24} color={AppColors.black} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>Şifre Değiştir</Text>
+        {/* ✅ Hardcoded "Şifre Değiştir" → t() ile değiştirildi */}
+        <Text style={styles.headerTitle}>{t("changePassword.title")}</Text>
         <View style={{ width: 40 }} />
       </View>
 
       <View style={styles.form}>
-        <Text style={styles.label}>Mevcut Şifre</Text>
+        {/* ✅ Tüm label ve button metinleri t() kullanıyor */}
+        <Text style={styles.label}>{t("changePassword.current")}</Text>
         <TextInput
           style={styles.input}
           secureTextEntry
           placeholder="••••••••"
           placeholderTextColor={AppColors.gray999}
           onChangeText={setCurrent}
+          value={current}
         />
 
-        <Text style={styles.label}>Yeni Şifre</Text>
+        <Text style={styles.label}>{t("changePassword.new")}</Text>
         <TextInput
           style={styles.input}
           secureTextEntry
           placeholder="••••••••"
           placeholderTextColor={AppColors.gray999}
           onChangeText={setNewPass}
+          value={newPass}
         />
 
-        <Text style={styles.label}>Yeni Şifre (Tekrar)</Text>
+        <Text style={styles.label}>{t("changePassword.confirm")}</Text>
         <TextInput
           style={styles.input}
           secureTextEntry
           placeholder="••••••••"
           placeholderTextColor={AppColors.gray999}
           onChangeText={setConfirm}
+          value={confirm}
         />
 
         <TouchableOpacity
@@ -125,7 +127,7 @@ export default function ChangePasswordScreen() {
           {loading ? (
             <ActivityIndicator color={AppColors.white} />
           ) : (
-            <Text style={styles.saveButtonText}>Şifreyi Güncelle</Text>
+            <Text style={styles.saveButtonText}>{t("changePassword.update")}</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -169,7 +171,7 @@ const styles = StyleSheet.create({
     padding: 15,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: AppColors.white,
+    borderColor: AppColors.whiteEa,
     color: AppColors.black,
   },
   saveButton: {

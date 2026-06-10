@@ -5,75 +5,62 @@ import {
   View,
   TouchableOpacity,
   ScrollView,
-  Image, // Eklendi: Fotoğrafı göstermek için
-  Alert, // Eklendi
+  Image,
+  Alert,
 } from "react-native";
-import React, { useState, useEffect } from "react"; // useState ve useEffect eklendi
-import { useRoute, useNavigation } from "@react-navigation/native";
+import React, { useState, useEffect } from "react";
+import { useNavigation } from "@react-navigation/native";
 import { Ionicons } from "@expo/vector-icons";
-import { useDispatch, useSelector } from "react-redux"; 
-import { logout } from "../redux/authSlice"; 
-import { signOut, deleteUser } from "firebase/auth"; 
-import { auth } from "../firebase/firebase"; 
+import { useDispatch, useSelector } from "react-redux";
+import { logout } from "../redux/authSlice";
+import { signOut, deleteUser } from "firebase/auth";
+import { auth } from "../firebase/firebase";
 import { SafeAreaView } from "react-native-safe-area-context";
 import { db } from "../firebase/firebase";
-import { AppColors } from "../styles/colors"; 
-import { doc, deleteDoc } from "firebase/firestore"; 
-import * as ImagePicker from "expo-image-picker"; // Eklendi: Kamera kütüphanesi
+import { AppColors } from "../styles/colors";
+import { doc, deleteDoc } from "firebase/firestore";
+import * as ImagePicker from "expo-image-picker";
+import { useTranslation } from "react-i18next";
 
 export default function ProfileScreen() {
   const navigation = useNavigation();
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.auth.user); 
-
-  // Fotoğraf URI tanımı
+  const user = useSelector((state) => state.auth.user);
+  const { t } = useTranslation();
   const [imageUri, setImageUri] = useState(null);
 
-  // Sayfa yüklendiğinde yerel veritabanından veya Firestore'dan mevcut profil resmini çekmek için:
   useEffect(() => {
-    // Örnek: if (user?.photoURL) setImageUri(user.photoURL);
-    // Veya yerel SQLite/AsyncStorage'dan çekebilirsin.
+    if (user?.photoURL) setImageUri(user.photoURL);
   }, [user]);
 
-  // HOCANIN İSTEDİĞİ KAMERA AÇMA VE KIRPMA FONKSİYONU
   const handleOpenCamera = async () => {
-    // 1. Kamera İzni İsteği
     const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
-
     if (permissionResult.granted === false) {
-      Alert.alert("İzin Gerekli", "Kamerayı kullanabilmek için izin vermelisiniz.");
+      // ✅ Hardcoded Türkçe → t() ile değiştirildi
+      Alert.alert(
+        t("profile.cameraPermRequired"),
+        t("profile.cameraPermMessage")
+      );
       return;
     }
-
-    // 2. Kamerayı Aç ve Kırpma Özelliğini Aktif Et
     const result = await ImagePicker.launchCameraAsync({
-      allowsEditing: true, // KURAL: Kırpma/seçme alanını açar
-      aspect: [1, 1],      // Bire bir (Kare) kırpma alanı sunar
-      quality: 0.7,        // Firestore için optimize edilmiş kalite
+      allowsEditing: true,
+      aspect: [1, 1],
+      quality: 0.7,
     });
-
-    // 3. Fotoğraf Çekildiyse ve Onaylandıysa
     if (!result.canceled) {
-      const selectedImage = result.assets[0].uri;
-      setImageUri(selectedImage); // Ekranda göstermek için state güncelle
-      // -------------------------------------------------------------
-      // 📌 KURAL: HAZIRLADIĞIN VERİTABANI İŞLEMLERİNİ BURADA ÇAĞIRACAKSIN
-      // -------------------------------------------------------------
-      // Örnek:
-      // uploadToFirestore(selectedImage);
-      // saveToLocalDatabase(selectedImage);
-      
-      Alert.alert("Başarılı", "Profil fotoğrafı başarıyla kaydedildi!");
+      setImageUri(result.assets[0].uri);
+      alert(t("profile.photoUpdateSuccess"));
     }
   };
 
   const handleLogout = async () => {
     try {
-      await signOut(auth); 
-      dispatch(logout()); 
+      await signOut(auth);
+      dispatch(logout());
     } catch (error) {
       console.log(error);
-      alert("Çıkış yapılamadı");
+      alert(t("profile.logoutError"));
     }
   };
 
@@ -85,21 +72,23 @@ export default function ProfileScreen() {
         await deleteUser(currentUser);
       }
       dispatch(logout());
-      alert("Hesabınız başarıyla silindi.");
+      alert(t("profile.deleteSuccess"));
     } catch (error) {
       console.log(error);
       if (error.code === "auth/requires-recent-login") {
-        alert("Hesabı silmek için tekrar giriş yapmanız gerekiyor.");
+        alert(t("profile.reauthRequired"));
       } else {
-        alert("Hesap silinirken hata oluştu.");
+        alert(t("profile.deleteError"));
       }
     }
   };
 
-  const displayData = {
-    fullName: user?.displayName || "Kullanıcı",
-    email: user?.email || "",
-  };
+  // ✅ Menü öğeleri: hardcoded Türkçe yerine t() kullanıyor
+  const menuItems = [
+    { key: "notifications", label: t("profile.notificationSettings") },
+    { key: "about",         label: t("profile.about") },
+    { key: "feedback",      label: t("profile.feedback") },
+  ];
 
   return (
     <SafeAreaView style={styles.container}>
@@ -115,63 +104,78 @@ export default function ProfileScreen() {
       </View>
 
       <ScrollView showsVerticalScrollIndicator={false}>
-        
-        {/* ==================== KAMERA VE PROFIL RESMI ALANI ==================== */}
         <View style={styles.cameraSection}>
           {!imageUri ? (
-            /* KURAL: Daha önce fotoğraf çekilmemişse YALNIZCA bu buton gösterilir */
-            <TouchableOpacity style={styles.primaryCaptureButton} onPress={handleOpenCamera}>
-              <Ionicons name="camera-outline" size={24} color={AppColors.white} style={{ marginRight: 8 }} />
-              <Text style={styles.primaryCaptureText}>Yeni Fotoğraf Çek</Text>
+            <TouchableOpacity
+              style={styles.primaryCaptureButton}
+              onPress={handleOpenCamera}
+            >
+              <Ionicons
+                name="camera-outline"
+                size={24}
+                color={AppColors.white}
+                style={{ marginRight: 8 }}
+              />
+              {/* ✅ "Yeni Fotoğraf Çek" → t() */}
+              <Text style={styles.primaryCaptureText}>
+                {t("profile.takePhoto")}
+              </Text>
             </TouchableOpacity>
           ) : (
-            /* KURAL: Fotoğraf tamamlanınca alan gösterilir ve altında Güncelle butonu yer alır */
             <View style={styles.avatarContainer}>
               <View style={styles.imageWrapper}>
                 <Image source={{ uri: imageUri }} style={styles.avatarImage} />
               </View>
-              
-              <TouchableOpacity style={styles.updateButton} onPress={handleOpenCamera}>
-                <Ionicons name="refresh-outline" size={18} color={AppColors.light_orange} style={{ marginRight: 5 }} />
-                <Text style={styles.updateButtonText}>Fotoğrafı Güncelle</Text>
+              <TouchableOpacity
+                style={styles.updateButton}
+                onPress={handleOpenCamera}
+              >
+                <Ionicons
+                  name="refresh-outline"
+                  size={18}
+                  color={AppColors.light_orange}
+                  style={{ marginRight: 5 }}
+                />
+                {/* ✅ "Fotoğrafı Güncelle" → t() */}
+                <Text style={styles.updateButtonText}>
+                  {t("profile.updatePhoto")}
+                </Text>
               </TouchableOpacity>
             </View>
           )}
         </View>
-        {/* ======================================================================= */}
 
         <View style={styles.header}>
-          <Text style={styles.userName}>{displayData.fullName}</Text>
-          <Text style={styles.userPhone}>{displayData.email}</Text>
+          {/* ✅ "Kullanıcı" fallback → t() */}
+          <Text style={styles.userName}>
+            {user?.displayName || t("profile.defaultUser")}
+          </Text>
+          <Text style={styles.userPhone}>{user?.email || ""}</Text>
         </View>
 
         <View style={styles.menuSection}>
-          <TouchableOpacity style={styles.menuItem}>
-            <Text style={styles.menuText}>Hat Bildirim Ayarları</Text>
-            <Text style={styles.arrow}>›</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.menuItem}>
-            <Text style={styles.menuText}>Uygulama Hakkında</Text>
-            <Text style={styles.arrow}>›</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.menuItem}>
-            <Text style={styles.menuText}>Bize Ulaşın / Geri Bildirim</Text>
-            <Text style={styles.arrow}>›</Text>
-          </TouchableOpacity>
+          {menuItems.map((item) => (
+            <TouchableOpacity key={item.key} style={styles.menuItem}>
+              <Text style={styles.menuText}>{item.label}</Text>
+              <Text style={styles.arrow}>›</Text>
+            </TouchableOpacity>
+          ))}
         </View>
 
         <View style={styles.footer}>
+          {/* ✅ "Oturumu Kapat" → t() */}
           <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
-            <Text style={styles.logoutText}>Oturumu Kapat</Text>
+            <Text style={styles.logoutText}>{t("profile.logout")}</Text>
           </TouchableOpacity>
         </View>
 
         <View style={styles.footer}>
+          {/* ✅ "Hesabı Sil" → t() */}
           <TouchableOpacity
             style={styles.deleteButton}
             onPress={handleDeleteAccount}
           >
-            <Text style={styles.logoutText}>Hesabı Sil</Text>
+            <Text style={styles.logoutText}>{t("profile.deleteAccount")}</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>
@@ -183,7 +187,7 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: AppColors.white },
   topBar: {
     paddingHorizontal: 20,
-    paddingTop: 20, // Tasarımın yukarı kaymaması için ideal boyuta çekildi
+    paddingTop: 20,
     paddingBottom: 5,
     justifyContent: "center",
   },
@@ -200,7 +204,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 2,
   },
-  // YENİ EKLENEN KAMERA VE AVATAR STİLLERİ
   cameraSection: {
     alignItems: "center",
     justifyContent: "center",
@@ -209,7 +212,7 @@ const styles = StyleSheet.create({
   },
   primaryCaptureButton: {
     flexDirection: "row",
-    backgroundColor: AppColors.light_orange, // Projenin ana rengine sadık kaldık
+    backgroundColor: AppColors.light_orange,
     paddingVertical: 14,
     paddingHorizontal: 24,
     borderRadius: 25,
@@ -225,22 +228,17 @@ const styles = StyleSheet.create({
     fontSize: 16,
     fontWeight: "bold",
   },
-  avatarContainer: {
-    alignItems: "center",
-  },
+  avatarContainer: { alignItems: "center" },
   imageWrapper: {
     width: 140,
     height: 140,
-    borderRadius: 70, // Kusursuz bir yuvarlak profil resmi
+    borderRadius: 70,
     borderWidth: 3,
     borderColor: AppColors.light_orange,
     overflow: "hidden",
     marginBottom: 12,
   },
-  avatarImage: {
-    width: "100%",
-    height: "100%",
-  },
+  avatarImage: { width: "100%", height: "100%" },
   updateButton: {
     flexDirection: "row",
     paddingVertical: 8,
@@ -255,14 +253,13 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: "600",
   },
-  // MEVCUT STİLLERİN DEVAMI
   header: {
     paddingHorizontal: 25,
     paddingTop: 5,
     paddingBottom: 25,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee", // Çizgi belirginleştirildi
-    alignItems: "center", // Yazılar ortalandı
+    borderBottomColor: "#eee",
+    alignItems: "center",
   },
   userName: { fontSize: 26, fontWeight: "bold", color: AppColors.black },
   userPhone: { fontSize: 15, color: AppColors.gray999, marginTop: 4 },
@@ -280,13 +277,13 @@ const styles = StyleSheet.create({
   arrow: { fontSize: 24, color: AppColors.gray2 },
   footer: { paddingHorizontal: 25, marginTop: 5 },
   logoutButton: {
-    backgroundColor: "#f2f2f7", // Arka plan hafif gri yapıldı buton gibi durması için
+    backgroundColor: "#f2f2f7",
     padding: 16,
     borderRadius: 12,
     alignItems: "center",
   },
   deleteButton: {
-    backgroundColor: "#fff1f1", // Silme butonuna hafif kırmızımsı bir ton
+    backgroundColor: "#fff1f1",
     padding: 16,
     borderRadius: 12,
     alignItems: "center",
