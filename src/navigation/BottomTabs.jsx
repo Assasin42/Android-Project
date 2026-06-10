@@ -35,7 +35,14 @@ function HomeStack({ route }) {
         component={HomeScreen}
         initialParams={{ name }}
       />
-      <Stack.Screen name="MapScreen" component={MapScreen} />
+      <Stack.Screen
+        name="MapScreen"
+        component={MapScreen}
+        options={{
+          headerShown: false,
+          title: "Map",
+        }}
+      />
     </Stack.Navigator>
   );
 }
@@ -65,7 +72,7 @@ export default function TabNavigator({ user, setUserData }) {
         component={HomeStack}
         initialParams={{ name: user?.name || "Yolcu" }}
         options={{
-          headerTitleAlign: "center",
+          headerShown: false,
           tabBarIcon: ({ focused }) => (
             <Ionicons
               name={focused ? "home-sharp" : "home-outline"}

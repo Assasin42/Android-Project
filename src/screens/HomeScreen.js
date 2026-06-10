@@ -14,17 +14,31 @@ import {
 } from "react-native";
 import ModalSelect from "../components/modalS";
 import Button from "../components/button";
+import GpsButton from "../components/GpsButton";
 import { LinearGradient } from "expo-linear-gradient";
 import LocationButton from "../components/locationButton";
 import { BlurView } from "expo-blur";
 import BusTime from "../components/busTime";
 import { useRoute } from "@react-navigation/native";
 import { AppColors } from "../styles/colors";
+import * as Location from "expo-location";
 export default function HomeScreen({ navigation }) {
   const [selectedValue, setSelectedValue] = useState(null);
   const [showBus, setShowBus] = useState(false);
   const dispatch = useDispatch();
 
+  const openMap = async () => {
+    const { status } = await Location.requestForegroundPermissionsAsync();
+    if (status !== "granted") {
+      alert("Konum İzni Gerekli");
+      return;
+    }
+    const location = await Location.getCurrentPositionAsync({});
+    navigation.navigate("MapScreen", {
+      latitude: location.coords.latitude,
+      longitude: location.coords.longitude,
+    });
+  };
   const secButton = () => {
     if (selectedValue == null) alert("Lütfen bir durak seçiniz.");
     else {
@@ -80,8 +94,16 @@ export default function HomeScreen({ navigation }) {
         <LocationButton
           label="Konumdan Seç"
           theme="primary"
-          onPress={() => navigation.navigate("MapScreen")}
+          onPress={() =>
+            navigation.navigate("MapScreen", {
+              latitude: 40.4378,
+              longitude: 39.5172,
+            })
+          }
         />
+      </View>
+      <View style={styles.gpsbutton}>
+        <GpsButton onPress={openMap} />
       </View>
     </ImageBackground>
   );
@@ -127,5 +149,10 @@ const styles = StyleSheet.create({
     marginTop: 10,
     width: "100%",
     alignItems: "center",
+  },
+  gpsbutton: {
+    position: "absolute",
+    bottom: 90,
+    right: 10,
   },
 });
