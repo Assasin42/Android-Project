@@ -7,11 +7,12 @@
     "title": "GÜMÜŞHANE",
     "subtitle": "AKILLI ULAŞIM SİSTEMİ",
     "email": "Email",
-    "password": "Şifre",
+    "password": "Parola",
     "loginButton": "Giriş Yap",
     "noAccount": "Hesabın yok mu? Üye Ol",
-    "emailRequired": "Email ve şifre zorunlu",
-    "wrongCredentials": "Email veya şifre yanlış"
+    "emailRequired": "Email ve parola zorunlu",
+    "wrongCredentials": "Email veya parola yanlış",
+    "phone": "Telefon"
   },
   "register": {
     "title": "Üye Ol",
@@ -19,16 +20,16 @@
     "surname": "Soyad",
     "phone": "Telefon",
     "email": "Email",
-    "password": "Şifre",
+    "password": "Parola",
     "registerButton": "Kayıt Ol",
     "alreadyAccount": "Zaten hesabın var mı? Giriş Yap",
-    "emailRequired": "Email ve şifre zorunlu",
+    "emailRequired": "Email ve parola zorunlu",
     "failed": "Kayıt başarısız",
     "registerSuccess": "Kayıt başarılı!",
     "registerError": "Kayıt sırasında bir hata oluştu."
   },
   "home": {
-    "welcome": "Hoşgeldiniz",
+    "welcome": "Hoşgeldin",
     "passenger": "Yolcu",
     "selectStop": "Bulunduğunuz Durağı Seçiniz",
     "select": "Seç",
@@ -36,6 +37,7 @@
     "selectFromLocation": "Konumdan Seç",
     "selectStopPlaceholder": "Bulunduğunuz Durağı Seçiniz",
     "menu": "Menü",
+    "profile": "Profil",
     "stops": {
       "semaDogan": "Sema Doğan",
       "hospital": "Hastane",
@@ -70,7 +72,7 @@
   "settings": {
     "sectionTitle": "Hesap ve Uygulama",
     "notifications": "Bildirim Ayarları",
-    "changePassword": "Şifre Değiştir",
+    "changePassword": "Parola Değiştir",
     "language": "Dil Seçenekleri",
     "darkMode": "Karanlık Mod",
     "helpSupport": "Yardım ve Destek",
@@ -79,21 +81,28 @@
     "english": "English"
   },
   "changePassword": {
-    "title": "Şifre Değiştir",
-    "current": "Mevcut Şifre",
-    "new": "Yeni Şifre",
-    "confirm": "Yeni Şifre (Tekrar)",
-    "update": "Şifreyi Güncelle",
+    "title": "Parola Değiştir",
+    "current": "Mevcut Parola",
+    "new": "Yeni Parola",
+    "confirm": "Yeni Parola (Tekrar)",
+    "update": "Parolayı Güncelle",
     "fillAll": "Lütfen tüm alanları doldurun.",
-    "notMatch": "Yeni şifreler eşleşmiyor.",
-    "wrongCurrent": "Mevcut şifre yanlış.",
-    "success": "Şifre başarıyla güncellendi!",
-    "error": "Şifre güncellenirken hata oluştu."
+    "notMatch": "Yeni parolalar eşleşmiyor.",
+    "wrongCurrent": "Mevcut parola yanlış.",
+    "success": "Parola başarıyla güncellendi!",
+    "error": "Parola güncellenirken hata oluştu."
   },
   "lines": {
     "title": "Hatlar"
   },
   "lineDetail": {
     "hat": "Hat"
+  },
+  "tabs": {
+    "home": "Ana Sayfa",
+    "stops": "Duraklar",
+    "lines": "Hatlar",
+    "profile": "Profil",
+    "settings": "Ayarlar"
   }
 }

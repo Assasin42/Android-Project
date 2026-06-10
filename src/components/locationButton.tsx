@@ -1,33 +1,39 @@
 import React from "react";
 import { StyleSheet, View, Pressable, Text } from "react-native";
-import { AppColors } from "../styles/colors";
 import { FontAwesome } from "@expo/vector-icons";
+import useTheme from "../hooks/useTheme";
+
 type Props = {
   label: string;
   theme?: "primary";
   onPress?: () => void;
 };
+
 export default function LocationButton({ label, theme, onPress }: Props) {
-  if (theme == "primary") {
+  const { colors } = useTheme();
+
+  if (theme === "primary") {
     return (
-      <View style={[styles.buttonContainer]}>
+      <View style={styles.buttonContainer}>
         <Pressable
-          style={[styles.button, { backgroundColor: AppColors.white }]}
+          style={[styles.button, { backgroundColor: colors.background }]}
           onPress={onPress}
         >
           <FontAwesome
             name="location-arrow"
             size={18}
-            color={AppColors.dark_blue}
+            color={colors.primaryBlue}
             style={styles.buttonIcon}
           />
-          <Text style={[styles.buttonLabel, { color: AppColors.black }]}>
+          <Text style={[styles.buttonLabel, { color: colors.textPrimary }]}>
             {label}
           </Text>
         </Pressable>
       </View>
     );
   }
+
+  return null;
 }
 
 const styles = StyleSheet.create({

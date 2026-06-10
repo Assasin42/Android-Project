@@ -35,7 +35,9 @@
     "noStop": "Please select a stop.",
     "selectFromLocation": "Select from Map",
     "selectStopPlaceholder": "Select Your Current Stop",
+    "profile": "Profile",
     "menu": "Menu",
+    "home": "Home",
     "stops": {
       "semaDogan": "Sema Doğan",
       "hospital": "Hospital",
@@ -96,5 +98,11 @@
   },
   "lineDetail": {
     "hat": "Line"
-  }
+  },
+  "tabs": {
+    "home": "Home",
+    "stops": "Stops",
+    "lines": "Lines",
+    "profile": "Profile"
+   }
 }

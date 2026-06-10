@@ -10,6 +10,7 @@ import ChangePasswordScreen from "../screens/ChangePasswordScreen.js";
 import MapScreen from "../screens/MapScreen.js";
 import CameraScreen from "../screens/CameraScreen.js"; // 1. EKLENDİ: Kamera ekranını import ettik
 import { AppColors } from "../styles/colors.js";
+import { useTranslation } from "react-i18next";
 
 const Tab = createBottomTabNavigator();
 const Stack = createNativeStackNavigator();
@@ -57,6 +58,8 @@ function HomeStack({ route }) {
 }
 
 export default function TabNavigator({ user, setUserData }) {
+
+  const { t } = useTranslation();
   return (
     <Tab.Navigator
       screenOptions={{
@@ -77,7 +80,7 @@ export default function TabNavigator({ user, setUserData }) {
       }}
     >
       <Tab.Screen
-        name="Duraklar"
+        name={t("tabs.home")}
         component={HomeStack}
         initialParams={{ name: user?.name || "Yolcu" }}
         options={{
@@ -92,7 +95,7 @@ export default function TabNavigator({ user, setUserData }) {
         }}
       />
       <Tab.Screen
-        name="Profile"
+        name={t("tabs.profile")}
         component={ProfileScreen}
         initialParams={{ user, setUserData }}
         options={{
@@ -108,7 +111,7 @@ export default function TabNavigator({ user, setUserData }) {
         }}
       />
       <Tab.Screen
-        name="Ayarlar"
+        name={t("tabs.settings")}
         component={SettingsStack}
         initialParams={{ user, setUserData }}
         options={{

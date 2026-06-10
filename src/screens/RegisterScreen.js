@@ -2,10 +2,10 @@ import React, { useState } from "react";
 import { createUserWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../firebase/firebase";
 import { useDispatch } from "react-redux";
-import { doc, setDoc } from "firebase/firestore"; // Firestore işlemleri için ekledik
-import { db } from "../firebase/firebase"; // Firestore referansı
+import { doc, setDoc } from "firebase/firestore";
+import { db } from "../firebase/firebase";
 import { loginSuccess } from "../redux/authSlice";
-import { updateProfile } from "firebase/auth"; // updateProfile ekle
+import { updateProfile } from "firebase/auth";
 import { AppColors } from "../styles/colors";
 import { useTranslation } from "react-i18next";
 import {
@@ -19,8 +19,11 @@ import {
   StyleSheet,
   ActivityIndicator,
 } from "react-native";
+import useTheme from "../hooks/useTheme";
 
 export default function RegisterScreen({ setIsRegistering }) {
+  const { colors } = useTheme();
+  const styles = createStyles(colors);
   const [name, setName] = useState("");
   const [surname, setSurname] = useState("");
   const [phone, setPhone] = useState("");
@@ -29,9 +32,10 @@ export default function RegisterScreen({ setIsRegistering }) {
   const [loading, setLoading] = useState(false);
   const dispatch = useDispatch();
   const { t } = useTranslation();
+
   const handleRegister = async () => {
     if (!email || !password) {
-      alert(t('register.emailRequired'));
+      alert(t("register.emailRequired"));
       return;
     }
 
@@ -40,9 +44,9 @@ export default function RegisterScreen({ setIsRegistering }) {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
         email,
-        password,
+        password
       );
-      alert(t('register.registerSuccess'));
+      alert(t("register.registerSuccess"));
       const user = userCredential.user;
 
       await updateProfile(user, {
@@ -56,12 +60,12 @@ export default function RegisterScreen({ setIsRegistering }) {
         email: email,
         createdAt: new Date().toISOString(),
       });
-      
+
       setIsRegistering(false);
     } catch (error) {
       console.log("HATA KODU:", error.code);
       console.log("HATA MESAJI:", error.message);
-      alert(t('register.failed'));
+      alert(t("register.failed"));
     } finally {
       setLoading(false);
     }
@@ -79,33 +83,33 @@ export default function RegisterScreen({ setIsRegistering }) {
           resizeMode="contain"
         />
 
-        <Text style={styles.title}>Üye Ol</Text>
+        <Text style={styles.title}>{t("register.title")}</Text>
 
         <TextInput
-          placeholder="Ad"
-          placeholderTextColor={AppColors.gray999}
+          placeholder={t("register.name")}
+          placeholderTextColor={colors.textMuted}
           style={styles.input}
           value={name}
           onChangeText={setName}
         />
         <TextInput
-          placeholder="Soyad"
-          placeholderTextColor={AppColors.gray999}
+          placeholder={t("register.surname")}
+          placeholderTextColor={colors.textMuted}
           style={styles.input}
           value={surname}
           onChangeText={setSurname}
         />
         <TextInput
-          placeholder="Telefon"
-          placeholderTextColor={AppColors.gray999}
+          placeholder={t("login.phone") || "Telefon"}
+          placeholderTextColor={colors.textMuted}
           style={styles.input}
           keyboardType="phone-pad"
           value={phone}
           onChangeText={setPhone}
         />
         <TextInput
-          placeholder="Email"
-          placeholderTextColor={AppColors.gray999}
+          placeholder={t("login.email") || "Email"}
+          placeholderTextColor={colors.textMuted}
           style={styles.input}
           keyboardType="email-address"
           autoCapitalize="none"
@@ -113,8 +117,8 @@ export default function RegisterScreen({ setIsRegistering }) {
           onChangeText={setEmail}
         />
         <TextInput
-          placeholder="Şifre"
-          placeholderTextColor={AppColors.gray999}
+          placeholder={t("login.password") || "Parola"}
+          placeholderTextColor={colors.textMuted}
           secureTextEntry
           style={styles.input}
           value={password}
@@ -127,71 +131,73 @@ export default function RegisterScreen({ setIsRegistering }) {
           disabled={loading}
         >
           {loading ? (
-            <ActivityIndicator color={AppColors.white} />
+            <ActivityIndicator color="#ffffff" />
           ) : (
-            <Text style={styles.buttonText}>Kayıt Ol</Text>
+            <Text style={styles.buttonText}>{t("register.registerButton")}</Text>
           )}
         </TouchableOpacity>
 
         <TouchableOpacity onPress={() => setIsRegistering(false)}>
-          <Text style={styles.link}>Zaten hesabın var mı? Giriş Yap</Text>
+          <Text style={styles.link}>{t("register.alreadyAccount")}</Text>
         </TouchableOpacity>
       </ScrollView>
     </KeyboardAvoidingView>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: AppColors.white,
-  },
-  scrollContent: {
-    flexGrow: 1,
-    paddingHorizontal: 25,
-    paddingBottom: 40,
-  },
-  logo: {
-    width: 250,
-    height: 150,
-    alignSelf: "center",
-    marginTop: 60,
-    marginBottom: 20,
-  },
-  title: {
-    fontSize: 18,
-    fontWeight: "bold",
-    textAlign: "center",
-    marginBottom: 20,
-    color: AppColors.brown2,
-  },
-  input: {
-    backgroundColor: AppColors.white,
-    paddingHorizontal: 15,
-    paddingVertical: 12,
-    borderRadius: 12,
-    marginBottom: 12,
-    borderWidth: 1,
-    borderColor: AppColors.whiteEa,
-    fontSize: 16,
-  },
-  button: {
-    backgroundColor: AppColors.gray1_0,
-    padding: 15,
-    borderRadius: 10,
-    alignItems: "center",
-    marginTop: 10,
-    elevation: 5,
-  },
-  buttonText: {
-    color: AppColors.white,
-    fontWeight: "bold",
-    fontSize: 15,
-  },
-  link: {
-    color: AppColors.brown,
-    marginTop: 20,
-    textAlign: "center",
-    fontSize: 14,
-  },
-});
+const createStyles = (colors) =>
+  StyleSheet.create({
+    container: {
+      flex: 1,
+      backgroundColor: colors.background,   
+    },
+    scrollContent: {
+      flexGrow: 1,
+      paddingHorizontal: 25,
+      paddingBottom: 40,
+    },
+    logo: {
+      width: 250,
+      height: 150,
+      alignSelf: "center",
+      marginTop: 60,
+      marginBottom: 20,
+    },
+    title: {
+      fontSize: 18,
+      fontWeight: "bold",
+      textAlign: "center",
+      marginBottom: 20,
+      color: colors.textPrimary,           
+    },
+    input: {
+      backgroundColor: colors.inputBg,      
+      paddingHorizontal: 15,
+      paddingVertical: 12,
+      borderRadius: 12,
+      marginBottom: 12,
+      borderWidth: 1,
+      borderColor: colors.inputBorder,      
+      color: colors.textPrimary,            
+      fontSize: 16,
+    },
+    button: {
+      backgroundColor: colors.successGreen,  
+      padding: 15,
+      borderRadius: 10,
+      alignItems: "center",
+      marginTop: 10,
+      elevation: 5,
+    },
+    buttonText: {
+      color: "#ffffff",                     
+      fontWeight: "bold",
+      fontSize: 15,
+    },
+    link: {
+      color: colors.textSecondary,           
+      marginTop: 20,
+      textAlign: "center",
+      fontSize: 14,
+    },
+  });

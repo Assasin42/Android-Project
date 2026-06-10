@@ -2,6 +2,7 @@ import React from "react";
 import MapView from "react-native-maps";
 import { StyleSheet, View } from "react-native";
 import { PROVIDER_GOOGLE } from "react-native-maps";
+import useTheme from "../hooks/useTheme";
 export default function App() {
   return (
     <View style={styles.container}>

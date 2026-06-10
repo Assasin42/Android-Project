@@ -1,10 +1,8 @@
 import { useState, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { logout } from "../redux/authSlice";
-import { signOut } from "firebase/auth";
-import { auth } from "../firebase/firebase";
-import DrawerButton from "../components/drawerButton";
+import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
+import useTheme from "../hooks/useTheme";
+import DrawerButton from "../components/drawerButton";
 
 import {
   Text,
@@ -22,7 +20,6 @@ import LocationButton from "../components/locationButton";
 import { BlurView } from "expo-blur";
 import BusTime from "../components/busTime";
 import { useRoute } from "@react-navigation/native";
-import { AppColors } from "../styles/colors";
 
 const { width } = Dimensions.get("window");
 const DRAWER_WIDTH = width * 0.75;
@@ -36,6 +33,8 @@ export default function HomeScreen({ navigation }) {
   const { t } = useTranslation();
   const route = useRoute();
   const user = useSelector((state) => state.auth.user);
+  const { colors, isDark } = useTheme();  // ✅ isDark de alınıyor
+  const styles = createStyles(colors);
 
   const toggleDrawer = () => {
     if (isDrawerOpen) {
@@ -62,17 +61,21 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
-  // ✅ Durak isimleri t() ile çekiliyor — dil değişince otomatik çevrilir
   const options = [
-    { label: t("home.stops.semaDogan"),    value: "Sema Doğan" },
-    { label: t("home.stops.hospital"),     value: "Hastane" },
-    { label: t("home.stops.university"),   value: "Üniversite" },
-    { label: t("home.stops.market"),       value: "Çarşı" },
-    { label: t("home.stops.busStation"),   value: "Otogar" },
-    { label: t("home.stops.zeynepAna"),    value: "Zeynep Ana" },
-    { label: t("home.stops.tepeYurt"),     value: "Tepe Yurt" },
-    { label: t("home.stops.teachersHouse"),value: "Öğretmen Evi" },
+    { label: t("home.stops.semaDogan"),     value: "Sema Doğan" },
+    { label: t("home.stops.hospital"),      value: "Hastane" },
+    { label: t("home.stops.university"),    value: "Üniversite" },
+    { label: t("home.stops.market"),        value: "Çarşı" },
+    { label: t("home.stops.busStation"),    value: "Otogar" },
+    { label: t("home.stops.zeynepAna"),     value: "Zeynep Ana" },
+    { label: t("home.stops.tepeYurt"),      value: "Tepe Yurt" },
+    { label: t("home.stops.teachersHouse"), value: "Öğretmen Evi" },
   ];
+
+  
+  const gradientColors = isDark
+    ? ["rgba(0,0,0,1)", "rgba(0,0,0,0.2)"]
+    : ["rgba(0,0,0,0.4)", "transparent"];
 
   return (
     <View style={{ flex: 1 }}>
@@ -81,7 +84,7 @@ export default function HomeScreen({ navigation }) {
         style={styles.container}
       >
         <LinearGradient
-          colors={[AppColors.black0_6, "transparent"]}
+          colors={gradientColors}
           style={StyleSheet.absoluteFill}
         />
 
@@ -94,7 +97,6 @@ export default function HomeScreen({ navigation }) {
         </TouchableOpacity>
 
         <BlurView intensity={10} borderRadius={30} style={styles.header}>
-          {/* ✅ "Hoşgeldiniz" ve "Yolcu" → t() */}
           <Text style={styles.headerText}>
             {t("home.welcome")}{" "}
             {user?.displayName || t("home.passenger")}
@@ -112,18 +114,17 @@ export default function HomeScreen({ navigation }) {
           </View>
 
           <View style={styles.buttonviewContainer}>
-            {/* ✅ "Seç" → t() */}
             <Button
               label={t("home.select")}
               theme="primary"
               onPress={secButton}
             />
           </View>
+
           {showBus && <BusTime />}
         </View>
 
         <View style={styles.buttonviewContainer}>
-          {/* ✅ "Konumdan Seç" → t() */}
           <LocationButton
             label={t("home.selectFromLocation")}
             theme="primary"
@@ -144,7 +145,6 @@ export default function HomeScreen({ navigation }) {
         style={[styles.drawer, { transform: [{ translateX: slideAnim }] }]}
       >
         <View style={styles.drawerHeader}>
-          {/* ✅ "Menü" → t() */}
           <Text style={styles.drawerTitle}>{t("home.menu")}</Text>
         </View>
 
@@ -155,92 +155,93 @@ export default function HomeScreen({ navigation }) {
             navigation.getParent()?.navigate("Profile");
           }}
         >
-          {/* ✅ "Profile" evrensel bir kelime, çeviriye gerek yok */}
-          <Text style={styles.drawerItemText}>👤 Profile</Text>
+          <Text style={styles.drawerItemText}>👤 {t("home.profile")}</Text>
         </TouchableOpacity>
       </Animated.View>
     </View>
   );
 }
 
-const styles = StyleSheet.create({
-  container: {
-    justifyContent: "center",
-    flex: 1,
-    alignItems: "center",
-  },
-  modalContainer: {
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  buttonviewContainer: {
-    alignItems: "center",
-    marginBottom: 20,
-  },
-  menuButton: {
-    position: "absolute",
-    top: 60,
-    left: 25,
-    zIndex: 99,
-    elevation: 5,
-    padding: 10,
-  },
-  header: {
-    position: "absolute",
-    top: 240,
-    left: 20,
-    right: 20,
-    backgroundColor: AppColors.black0_3,
-    padding: 10,
-    borderRadius: 10,
-  },
-  headerText: {
-    color: AppColors.light_orange,
-    fontSize: 28,
-  },
-  content: {
-    marginTop: 10,
-    width: "100%",
-    alignItems: "center",
-  },
-  overlay: {
-    ...StyleSheet.absoluteFillObject,
-    backgroundColor: "rgba(0,0,0,0.5)",
-    zIndex: 100,
-  },
-  drawer: {
-    position: "absolute",
-    top: 0,
-    bottom: 0,
-    left: 0,
-    width: DRAWER_WIDTH,
-    backgroundColor: "#1c1c1e",
-    zIndex: 101,
-    paddingTop: 80,
-    paddingHorizontal: 20,
-    borderTopRightRadius: 20,
-    borderBottomRightRadius: 20,
-  },
-  drawerHeader: {
-    borderBottomWidth: 1,
-    borderBottomColor: "#3a3a3c",
-    paddingBottom: 15,
-    marginBottom: 20,
-  },
-  drawerTitle: {
-    fontSize: 22,
-    fontWeight: "bold",
-    color: "#ff9500",
-  },
-  drawerItem: {
-    backgroundColor: "#2c2c2e",
-    padding: 15,
-    borderRadius: 10,
-    marginBottom: 10,
-  },
-  drawerItemText: {
-    color: "#fff",
-    fontSize: 16,
-    fontWeight: "600",
-  },
-});
+const createStyles = (colors) =>
+  StyleSheet.create({
+    container: {
+      justifyContent: "center",
+      flex: 1,
+      alignItems: "center",
+    },
+    modalContainer: {
+      alignItems: "center",
+      marginBottom: 20,
+    },
+    buttonviewContainer: {
+      alignItems: "center",
+      marginBottom: 20,
+    },
+    menuButton: {
+      position: "absolute",
+      top: 60,
+      left: 25,
+      zIndex: 99,
+      elevation: 5,
+      padding: 10,
+    },
+    header: {
+      position: "absolute",
+      top: 240,
+      left: 20,
+      right: 20,
+      backgroundColor: "rgba(0, 0, 0, 0.43)",
+      padding: 10,
+      borderRadius: 10,
+    },
+    headerText: {
+      color: "#ffffff",
+      fontSize: 28,
+    },
+    content: {
+      marginTop: 10,
+      width: "100%",
+      alignItems: "center",
+    },
+    overlay: {
+      ...StyleSheet.absoluteFillObject,
+      backgroundColor: "rgba(0,0,0,0.5)",
+      zIndex: 100,
+    },
+    // ✅ Drawer artık colors kullanıyor
+    drawer: {
+      position: "absolute",
+      top: 0,
+      bottom: 0,
+      left: 0,
+      width: DRAWER_WIDTH,
+      backgroundColor: colors.surface,
+      zIndex: 101,
+      paddingTop: 80,
+      paddingHorizontal: 20,
+      borderTopRightRadius: 20,
+      borderBottomRightRadius: 20,
+    },
+    drawerHeader: {
+      borderBottomWidth: 1,
+      borderBottomColor: colors.surfaceBorder,
+      paddingBottom: 15,
+      marginBottom: 20,
+    },
+    drawerTitle: {
+      fontSize: 22,
+      fontWeight: "bold",
+      color: colors.accentOrange,
+    },
+    drawerItem: {
+      backgroundColor: colors.inputBg,
+      padding: 15,
+      borderRadius: 10,
+      marginBottom: 10,
+    },
+    drawerItemText: {
+      color: colors.textPrimary,
+      fontSize: 16,
+      fontWeight: "600",
+    },
+  });

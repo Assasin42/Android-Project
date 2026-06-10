@@ -21,13 +21,17 @@ import { AppColors } from "../styles/colors";
 import { doc, deleteDoc } from "firebase/firestore";
 import * as ImagePicker from "expo-image-picker";
 import { useTranslation } from "react-i18next";
+import useTheme from "../hooks/useTheme";
 
 export default function ProfileScreen() {
   const navigation = useNavigation();
+  const { colors } = useTheme(); 
+  const styles = createStyles(colors);
   const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
   const { t } = useTranslation();
   const [imageUri, setImageUri] = useState(null);
+
 
   useEffect(() => {
     if (user?.photoURL) setImageUri(user.photoURL);
@@ -36,7 +40,6 @@ export default function ProfileScreen() {
   const handleOpenCamera = async () => {
     const permissionResult = await ImagePicker.requestCameraPermissionsAsync();
     if (permissionResult.granted === false) {
-      // ✅ Hardcoded Türkçe → t() ile değiştirildi
       Alert.alert(
         t("profile.cameraPermRequired"),
         t("profile.cameraPermMessage")
@@ -113,7 +116,7 @@ export default function ProfileScreen() {
               <Ionicons
                 name="camera-outline"
                 size={24}
-                color={AppColors.white}
+                color={AppColors.black}
                 style={{ marginRight: 8 }}
               />
               {/* ✅ "Yeni Fotoğraf Çek" → t() */}
@@ -183,8 +186,8 @@ export default function ProfileScreen() {
   );
 }
 
-const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: AppColors.white },
+const createStyles = (colors) => StyleSheet.create({
+  container: { flex: 1, backgroundColor: colors.background },
   topBar: {
     paddingHorizontal: 20,
     paddingTop: 20,
@@ -224,7 +227,7 @@ const styles = StyleSheet.create({
     shadowRadius: 3,
   },
   primaryCaptureText: {
-    color: AppColors.white,
+    color: AppColors.black,
     fontSize: 16,
     fontWeight: "bold",
   },
@@ -261,8 +264,8 @@ const styles = StyleSheet.create({
     borderBottomColor: "#eee",
     alignItems: "center",
   },
-  userName: { fontSize: 26, fontWeight: "bold", color: AppColors.black },
-  userPhone: { fontSize: 15, color: AppColors.gray999, marginTop: 4 },
+  userName: { fontSize: 26, fontWeight: "bold", color: colors.textPrimary },
+  userPhone: { fontSize: 15, color: colors.textMuted, marginTop: 4 },
   menuSection: { paddingVertical: 10 },
   menuItem: {
     flexDirection: "row",
@@ -273,7 +276,7 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: "#eee",
   },
-  menuText: { fontSize: 16, color: AppColors.black333, fontWeight: "500" },
+  menuText: { fontSize: 16, color: colors.textPrimary, fontWeight: "500" },
   arrow: { fontSize: 24, color: AppColors.gray2 },
   footer: { paddingHorizontal: 25, marginTop: 5 },
   logoutButton: {

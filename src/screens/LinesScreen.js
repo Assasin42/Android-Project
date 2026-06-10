@@ -5,6 +5,7 @@ import BusCard from "../components/busTime";
 import Header from "../components/Header";
 import { TouchableOpacity, Text } from "react-native";
 import { useTranslation } from "react-i18next";
+import useTheme from "../hooks/useTheme";
 
 
 export default function LinesScreen() {

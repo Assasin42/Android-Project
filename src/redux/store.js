@@ -4,6 +4,7 @@ import authReducer from "./authSlice";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { persistReducer, persistStore } from "redux-persist";
 import { combineReducers } from "redux";
+import themeReducer from "./themeSlice";
 
 const persistConfig = {
   key: "root",
@@ -12,6 +13,7 @@ const persistConfig = {
 
 const rootReducer = combineReducers({
   auth: authReducer,
+  theme: themeReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);
@@ -21,7 +23,7 @@ export const store = configureStore({
 
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
-      serializableCheck: false, // 👈 BU ZORUNLU
+      serializableCheck: false,
     }),
 });
 
