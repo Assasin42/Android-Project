@@ -111,8 +111,7 @@ export default function TabNavigator({ user, setUserData }) {
         component={ProfileScreen}
         initialParams={{ user, setUserData }}
         options={{
-          headerTitleAlign: "center",
-          headerTintColor: AppColors.dark_blue,
+          headerShown: false,
           tabBarIcon: ({ focused }) => (
             <Ionicons
               name={focused ? "person-sharp" : "person-outline"}

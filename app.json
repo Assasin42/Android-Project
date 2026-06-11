@@ -23,10 +23,13 @@
         "monochromeImage": "./assets/android-icon-monochrome.png"
       },
       "package": "com.messi10kaya.navigationandbottomtabs",
-      "permissions": ["ACCESS_FINE_LOCATION", "ACCESS_COARSE_LOCATION"],
+      "permissions": [
+        "ACCESS_FINE_LOCATION",
+        "ACCESS_COARSE_LOCATION"
+      ],
       "config": {
         "googleMaps": {
-          "apiKey": "AIzaSyBwL5mX1K6uciDTqCQYLfxIEf862lKeHm4"
+          "apiKey": "AIzaSyAwl__phBaEFZ9I6rYCo5KY36K3j9lxXow"
         }
       }
     },
@@ -38,11 +41,12 @@
       [
         "react-native-maps",
         {
-          "googleMapsApiKey": "AIzaSyBwL5mX1K6uciDTqCQYLfxIEf862lKeHm4"
+          "googleMapsApiKey": "AIzaSyAwl__phBaEFZ9I6rYCo5KY36K3j9lxXow"
         }
       ],
       "expo-sqlite",
-      "expo-localization"
+      "expo-localization",
+      "expo-font"
     ],
     "extra": {
       "eas": {

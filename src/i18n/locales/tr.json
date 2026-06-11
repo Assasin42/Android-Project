@@ -47,7 +47,14 @@
       "zeynepAna": "Zeynep Ana",
       "tepeYurt": "Tepe Yurt",
       "teachersHouse": "Öğretmen Evi"
-    }
+    },
+    "logout": "Çıkış",
+    "logoutConfirm": "Çıkış yapmak istediğinize emin misiniz?",
+    "cancel": "İptal",
+    "locationPermission": "Konum izni verilmedi.",
+    "enableLocation": "Lütfen konum servislerini açın.",
+    "locationError": "Konum alınamadı",
+    "settings": "Ayarlar"
   },
   "profile": {
     "defaultUser": "Yolcu",
@@ -122,6 +129,18 @@
     "photoSaved": "Fotoğraf kaydedildi",
     "photoSaveError": "Fotoğraf kaydedilirken hata oluştu.",
     "takePhoto": "Yeni Fotoğraf Çek"
+  },
+  "map": {
+    "title": "Güzergah Haritası",
+    "searchPlaceholder": "Durak ara...",
+    "allStops": "Tüm Duraklar",
+    "close": "Kapat",
+    "stop": "Durak",
+    "route": "Güzergah",
+    "startPoint": "Başlangıç Noktası",
+    "busStop": "Otobüs Durağı",
+    "selectedStop": "Seçili Durak",
+    "legend": "Harita Göstergeleri",
+    "totalStops": "Toplam {count} durak"
   }
 }
-

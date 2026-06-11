@@ -38,7 +38,7 @@
     "profile": "Profile",
     "menu": "Menu",
     "logout": "Logout",
-    "settings":"Settings",
+    "settings": "Settings",
     "home": "Home",
     "stops": {
       "semaDogan": "Sema Doğan",
@@ -49,7 +49,12 @@
       "zeynepAna": "Zeynep Ana",
       "tepeYurt": "Tepe Yurt",
       "teachersHouse": "Teachers' House"
-    }
+    },
+    "logoutConfirm": "Are you sure you want to logout?",
+    "cancel": "Cancel",
+    "locationPermission": "Location permission denied.",
+    "enableLocation": "Please enable location services.",
+    "locationError": "Could not get location"
   },
   "profile": {
     "defaultUser": "Passenger",
@@ -107,7 +112,7 @@
     "lines": "Lines",
     "profile": "Profile",
     "settings": "Settings"
-   },
+  },
   "camera": {
     "loading": "Loading camera...",
     "permissionRequired": "Camera Permission Required",
@@ -121,6 +126,18 @@
     "uploadError": "There was a problem saving the photo.",
     "userNotFound": "No signed-in user found.",
     "ok": "OK"
+  },
+  "map": {
+    "title": "Route Map",
+    "searchPlaceholder": "Search stop...",
+    "allStops": "All Stops",
+    "close": "Close",
+    "stop": "Stop",
+    "route": "Route",
+    "startPoint": "Starting Point",
+    "busStop": "Bus Stop",
+    "selectedStop": "Selected Stop",
+    "legend": "Map Legend",
+    "totalStops": "Total {count} stops"
   }
 }
-   
