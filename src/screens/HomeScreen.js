@@ -18,6 +18,7 @@ import {
   Alert,
 } from "react-native";
 import ModalSelect from "../components/modalS";
+import { busLocations } from "../data/busLocations";
 import Button from "../components/button";
 import { LinearGradient } from "expo-linear-gradient";
 import LocationButton from "../components/locationButton";
@@ -46,25 +47,13 @@ export default function HomeScreen({ navigation }) {
   const styles = createStyles(colors);
 
   useFocusEffect(
-    useCallback(() => {
-      const loadPhotoFromFirestore = async () => {
-        try {
-          const docRef = doc(db, "users", user.uid, "photos", "profile");
-          const docSnap = await getDoc(docRef);
-
-          if (docSnap.exists()) {
-            setFirebasePhoto(docSnap.data().uri);
-          }
-        } catch (error) {
-          console.log("Drawer fotoğraf yükleme hatası:", error);
-        }
-      };
-
-      if (user?.uid) {
-        loadPhotoFromFirestore();
-      }
-    }, [user?.uid])
-  );
+  useCallback(() => {
+    if (route.params?.nearestStop) {
+      setSelectedValue(route.params.nearestStop);
+      navigation.setParams({ nearestStop: undefined }); // parametreyi temizle
+    }
+  }, [route.params?.nearestStop])
+);
 
   const openMap = async () => {
   try {
@@ -145,16 +134,10 @@ export default function HomeScreen({ navigation }) {
     );
   };
 
-  const options = [
-    { label: t("home.stops.semaDogan"), value: "Sema Doğan" },
-    { label: t("home.stops.hospital"), value: "Hastane" },
-    { label: t("home.stops.university"), value: "Üniversite" },
-    { label: t("home.stops.market"), value: "Çarşı" },
-    { label: t("home.stops.busStation"), value: "Otogar" },
-    { label: t("home.stops.zeynepAna"), value: "Zeynep Ana" },
-    { label: t("home.stops.tepeYurt"), value: "Tepe Yurt" },
-    { label: t("home.stops.teachersHouse"), value: "Öğretmen Evi" },
-  ];
+  const options = busLocations.map((location) => ({
+  label: location.title,
+  value: location.title,
+}));
 
   const gradientColors = isDark
     ? ["rgba(0,0,0,1)", "rgba(0,0,0,0.2)"]
@@ -352,7 +335,7 @@ const createStyles = (colors) =>
     },
     header: {
       position: "absolute",
-      top: 240,
+      top: 120,
       left: 20,
       right: 20,
       backgroundColor: "rgba(0, 0, 0, 0.43)",
