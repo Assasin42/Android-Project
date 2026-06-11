@@ -400,9 +400,9 @@ const createStyles = (colors) =>
     },
     header: {
       position: "absolute",
-      top: 120,
-      left: 20,
-      right: 20,
+      top: 60,
+      left: 100,
+      right: 40,
       backgroundColor: "rgba(0, 0, 0, 0.43)",
       padding: 10,
       borderRadius: 10,
