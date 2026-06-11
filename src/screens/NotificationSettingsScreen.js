@@ -8,13 +8,12 @@ import { scale, verticalScale, moderateScale } from 'react-native-size-matters';
 export default function NotificationSettingsScreen() {
   const navigation = useNavigation();
 
-  // Bildirim switch durumları
+  
   const [isAllNotificationsEnabled, setIsAllNotificationsEnabled] = useState(true);
   const [isBusApproachingEnabled, setIsBusApproachingEnabled] = useState(true);
   const [isLineChangesEnabled, setIsLineChangesEnabled] = useState(false);
   const [isFavoriteStopsEnabled, setIsFavoriteStopsEnabled] = useState(true);
 
-  // Genel bildirim açma/kapatma fonksiyonu
   const toggleAllNotifications = (value) => {
     setIsAllNotificationsEnabled(value);
     if (!value) {

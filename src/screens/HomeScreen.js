@@ -1,10 +1,11 @@
-import { useState, useRef, useCallback } from "react";
+import { useState, useRef, useCallback, useEffect } from "react";
 import { useSelector } from "react-redux";
 import { useTranslation } from "react-i18next";
 import useTheme from "../hooks/useTheme";
 import DrawerButton from "../components/drawerButton";
-import GpsButton from "../components/GpsButton"; // Eklendi
-import * as Location from "expo-location";       // Eklendi
+import GpsButton from "../components/GpsButton"; 
+import * as Location from "expo-location";       
+import MapView, { Marker } from "react-native-maps"; // 1. Harita bileşenleri eklendi
 
 import {
   Text,
@@ -39,6 +40,14 @@ export default function HomeScreen({ navigation }) {
   const [showBus, setShowBus] = useState(false);
   const [isDrawerOpen, setIsDrawerOpen] = useState(false);
 
+  // 2. Önizleme haritası için konum state'i (Varsayılan olarak Gümüşhane koordinatları ayarlandı)
+  const [previewRegion, setPreviewRegion] = useState({
+    latitude: 40.4378,
+    longitude: 39.5172,
+    latitudeDelta: 0.015,
+    longitudeDelta: 0.015,
+  });
+
   const slideAnim = useRef(new Animated.Value(-DRAWER_WIDTH)).current;
   const { t } = useTranslation();
   const route = useRoute();
@@ -46,47 +55,77 @@ export default function HomeScreen({ navigation }) {
   const { colors, isDark } = useTheme();
   const styles = createStyles(colors);
 
+  // 3. Uygulama açıldığında veya sayfa odaklandığında önizleme konumunu sessizce güncelle
   useFocusEffect(
-  useCallback(() => {
-    if (route.params?.nearestStop) {
-      setSelectedValue(route.params.nearestStop);
-      navigation.setParams({ nearestStop: undefined }); // parametreyi temizle
-    }
-  }, [route.params?.nearestStop])
-);
+    useCallback(() => {
+      async function getSilentLocation() {
+        try {
+          const { status } = await Location.getForegroundPermissionsAsync();
+          if (status === "granted") {
+            const location = await Location.getCurrentPositionAsync({
+              accuracy: Location.Accuracy.Balanced,
+            });
+            setPreviewRegion({
+              latitude: location.coords.latitude,
+              longitude: location.coords.longitude,
+              latitudeDelta: 0.012,
+              longitudeDelta: 0.012,
+            });
+          }
+        } catch (error) {
+          console.log("Önizleme konum güncelleme hatası:", error);
+        }
+      }
+      getSilentLocation();
+    }, [])
+  );
+
+  useFocusEffect(
+    useCallback(() => {
+      if (route.params?.nearestStop) {
+        setSelectedValue(route.params.nearestStop);
+        navigation.setParams({ nearestStop: undefined }); 
+      }
+    }, [route.params?.nearestStop])
+  );
 
   const openMap = async () => {
-  try {
-    const { status } = await Location.requestForegroundPermissionsAsync();
-    if (status !== 'granted') {
-      Alert.alert(t("home.locationPermission"));
-      return;
-    }
-
-    // Servis açık mı?
-    let enabled = false;
     try {
-      enabled = await Location.hasServicesEnabledAsync();
-    } catch (e) {
-      // hata durumunda varsayalım ki açık değil
-    }
-    if (!enabled) {
-      Alert.alert(t("home.enableLocation"));
-      return;
-    }
+      const { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== 'granted') {
+        Alert.alert(t("home.locationPermission"));
+        return;
+      }
 
-    // Daha sağlıklı konum alma
-    const location = await Location.getCurrentPositionAsync({
-      accuracy: Location.Accuracy.Balanced,
-    });
-    navigation.navigate("MapScreen", {
-      latitude: location.coords.latitude,
-      longitude: location.coords.longitude,
-    });
-  } catch (error) {
-    Alert.alert(t("home.locationError"), error.message);
-  }
-};
+      let enabled = false;
+      try {
+        enabled = await Location.hasServicesEnabledAsync();
+      } catch (e) {}
+      if (!enabled) {
+        Alert.alert(t("home.enableLocation"));
+        return;
+      }
+
+      const location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.Balanced,
+      });
+
+      // Büyük haritaya giderken state'teki önizlemeyi de güncel tutalım
+      setPreviewRegion({
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+        latitudeDelta: 0.012,
+        longitudeDelta: 0.012,
+      });
+
+      navigation.navigate("MapScreen", {
+        latitude: location.coords.latitude,
+        longitude: location.coords.longitude,
+      });
+    } catch (error) {
+      Alert.alert(t("home.locationError"), error.message);
+    }
+  };
 
   const toggleDrawer = () => {
     if (isDrawerOpen) {
@@ -135,9 +174,9 @@ export default function HomeScreen({ navigation }) {
   };
 
   const options = busLocations.map((location) => ({
-  label: location.title,
-  value: location.title,
-}));
+    label: location.title,
+    value: location.title,
+  }));
 
   const gradientColors = isDark
     ? ["rgba(0,0,0,1)", "rgba(0,0,0,0.2)"]
@@ -188,9 +227,36 @@ export default function HomeScreen({ navigation }) {
           </View>
 
           {showBus && <BusTime />}
+
+          {/* 4. Konum Önizleme Kartı (Harita) */}
+          <TouchableOpacity 
+            style={styles.mapPreviewCard} 
+            activeOpacity={0.9}
+            onPress={openMap} // Üzerine tıklanınca tam ekran haritaya atsın
+          >
+            <MapView
+              style={styles.miniMap}
+              region={previewRegion}
+              scrollEnabled={false} // Kart formunda kalması için el hareketlerini kapatıyoruz
+              zoomEnabled={false}
+              rotateEnabled={false}
+              pitchEnabled={false}
+            >
+              <Marker 
+                coordinate={{ 
+                  latitude: previewRegion.latitude, 
+                  longitude: previewRegion.longitude 
+                }} 
+                pinColor={colors.accentOrange || "red"}
+              />
+            </MapView>
+            <View style={styles.mapOverlayLabel}>
+              <Ionicons name="map-outline" size={14} color="#fff" style={{ marginRight: 5 }} />
+              <Text style={styles.mapOverlayText}>Konumunu Önizlemek İçin Tıkla</Text>
+            </View>
+          </TouchableOpacity>
         </View>
 
-        {/* LocationButton artık sabit koordinatla MapScreen’e yönlendiriyor (ilk koddaki gibi) */}
         <View style={styles.buttonviewContainer}>
           <LocationButton
             label={t("home.selectFromLocation")}
@@ -204,7 +270,6 @@ export default function HomeScreen({ navigation }) {
           />
         </View>
 
-        {/* Eklendi: GpsButton ile anlık konum alıp haritaya gitme */}
         <View style={styles.gpsbutton}>
           <GpsButton onPress={openMap} />
         </View>
@@ -347,11 +412,47 @@ const createStyles = (colors) =>
       fontSize: 28,
     },
     content: {
-      marginTop: 10,
+      marginTop: 80, // Harita kartına yer açmak için üst mesafeyi hafif açtık
       width: "100%",
       alignItems: "center",
     },
-    // Yeni eklenen GpsButton stili
+    
+    // 5. Harita Önizleme Stilleri Eklendi
+    mapPreviewCard: {
+      width: width * 0.85,
+      height: 140,
+      borderRadius: 20,
+      overflow: "hidden",
+      marginVertical: 15,
+      borderWidth: 2,
+      borderColor: colors.surfaceBorder || "rgba(255,255,255,0.2)",
+      elevation: 4,
+      shadowColor: "#000",
+      shadowOffset: { width: 0, height: 2 },
+      shadowOpacity: 0.25,
+      shadowRadius: 3.84,
+    },
+    miniMap: {
+      width: "100%",
+      height: "100%",
+    },
+    mapOverlayLabel: {
+      position: "absolute",
+      bottom: 0,
+      left: 0,
+      right: 0,
+      backgroundColor: "rgba(0, 0, 0, 0.6)",
+      paddingVertical: 6,
+      flexDirection: "row",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    mapOverlayText: {
+      color: "#ffffff",
+      fontSize: 12,
+      fontWeight: "600",
+    },
+
     gpsbutton: {
       position: "absolute",
       bottom: 90,

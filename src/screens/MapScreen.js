@@ -15,23 +15,12 @@ import { AppColors } from "../styles/colors";
 import { BlurView } from "expo-blur";
 import { haversineDistance, findNearestStop } from "../utils/haversine";
 
-// ─── Koleksiyon adı: busLines (busStops değil, orada kural yok!) ──────────────
+
 const BUS_LINES_COLLECTION = "busLines";
 
-// ─── Bilinen sabit alanlar — bunlar durak değil ───────────────────────────────
+ 
 const RESERVED_FIELDS = new Set(["id", "name", "time", "routeId", "lineId"]);
 
-/**
- * Firestore busLines dokümanından durak listesi çıkarır.
- *
- * İki yapıyı destekler:
- * A) stops / duraklar adında map alanı varsa:
- *    { stops: { "Durak Adı": GeoPoint, ... } }
- * B) Yoksa, doğrudan dokümandaki GeoPoint alanlarını tarar:
- *    { "Durak Adı": GeoPoint, id: "3", name: "35C", ... }
- *
- * Firebase GeoPoint nesnelerinin .latitude ve .longitude property'si vardır.
- */
 function extractStopsFromDoc(docId, docData) {
   const stops = [];
 
