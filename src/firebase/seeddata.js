@@ -3,9 +3,9 @@ import { doc, setDoc } from "firebase/firestore";
 
 export const seedBusLines = async () => {
   const busLines = [
-    { id: "1", name: "15A", stops: ["Merkez", "Üniversite", "Hastane", "Stadyum"],time: "5dk" },
-    { id: "2", name: "22B", stops: ["Otogar", "Merkez", "Stadyum"], time: "5dk" },
-    { id: "3", name: "35C", stops: ["Üniversite", "Otogar", "Hastane"], time: "5dk" },
+    { id: "1", name: "1A", stops: ["Merkez", "Üniversite", "Hastane", "Stadyum"],time: "5dk" },
+    { id: "2", name: "2A", stops: ["Otogar", "Merkez", "Stadyum"], time: "5dk" },
+    { id: "3", name: "3A", stops: ["Üniversite", "Otogar", "Hastane"], time: "5dk" },
   ];
 
   for (const line of busLines) {

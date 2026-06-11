@@ -48,6 +48,7 @@ export default function HomeScreen({ navigation }) {
     longitudeDelta: 0.015,
   });
 
+const [confirmedStop, setConfirmedStop] = useState(null);
   const slideAnim = useRef(new Animated.Value(-DRAWER_WIDTH)).current;
   const { t } = useTranslation();
   const route = useRoute();
@@ -144,13 +145,15 @@ export default function HomeScreen({ navigation }) {
     }
   };
 
-  const secButton = () => {
-    if (selectedValue == null) alert(t("home.noStop"));
-    else {
-      setShowBus(true);
-      setSelectedValue(null);
-    }
-  };
+  // secButton fonksiyonunu şöyle güncelle:
+const secButton = () => {
+  if (selectedValue == null) alert(t("home.noStop"));
+  else {
+    setConfirmedStop(selectedValue); // ← durağı kaydet
+    setShowBus(true);
+    setSelectedValue(null);          // ← modal sıfırlanır ama durak kaybolmaz
+  }
+};
 
   const handleLogout = () => {
     Alert.alert(
@@ -226,7 +229,8 @@ export default function HomeScreen({ navigation }) {
             />
           </View>
 
-          {showBus && <BusTime />}
+  
+{showBus && <BusTime stop={confirmedStop} />}
 
           {/* 4. Konum Önizleme Kartı (Harita) */}
           <TouchableOpacity 

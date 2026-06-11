@@ -172,20 +172,6 @@ export default function ProfileScreen() {
           <Text style={styles.userEmail}>{user?.email || ""}</Text>
         </View>
 
-        {/* Menü */}
-        <View style={styles.menuSection}>
-          {menuItems.map((item) => (
-            <TouchableOpacity key={item.key} style={styles.menuItem}>
-              <Text style={styles.menuText}>{item.label}</Text>
-              <Ionicons
-                name="chevron-forward"
-                size={20}
-                color={colors.iconMuted}
-              />
-            </TouchableOpacity>
-          ))}
-        </View>
-
         {/* Çıkış butonu */}
         <View style={styles.footer}>
           <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>

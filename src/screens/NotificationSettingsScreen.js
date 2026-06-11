@@ -34,7 +34,7 @@ export default function NotificationSettingsScreen() {
           <Ionicons name="chevron-back" size={24} color="black" />
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Bildirim Ayarları</Text>
-        <View style={{ width: 24 }} /> {/* Dengeli header duruşu için boş alan */}
+        <View style={{ width: 24 }} />
       </View>
 
       <ScrollView contentContainerStyle={styles.content}>
@@ -113,7 +113,7 @@ const styles = StyleSheet.create({
   header: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'between',
+    justifyContent: 'space-between',
     paddingHorizontal: scale(16),
     height: verticalScale(50),
     backgroundColor: '#FFF',
@@ -129,7 +129,7 @@ const styles = StyleSheet.create({
     color: '#333',
     flex: 1,
     textAlign: 'center',
-    marginRight: scale(24), // Geri butonu simetrisini korumak için
+    marginRight: scale(24), 
   },
   content: {
     padding: scale(16),
